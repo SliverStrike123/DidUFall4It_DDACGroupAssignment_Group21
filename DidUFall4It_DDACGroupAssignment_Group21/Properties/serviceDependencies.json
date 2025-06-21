@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:DidUFall4It_DDACGroupAssignment_Group21ContextConnection"
+    }
+  }
+}
