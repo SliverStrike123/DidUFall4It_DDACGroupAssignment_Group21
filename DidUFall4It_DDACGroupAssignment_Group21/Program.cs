@@ -7,7 +7,11 @@ var connectionString = builder.Configuration.GetConnectionString("DidUFall4It_DD
 
 builder.Services.AddDbContext<DidUFall4It_DDACGroupAssignment_Group21Context>(options => options.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<DidUFall4It_DDACGroupAssignment_Group21User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<DidUFall4It_DDACGroupAssignment_Group21Context>();
+builder.Services.AddDefaultIdentity<DidUFall4It_DDACGroupAssignment_Group21User>
+    (options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<DidUFall4It_DDACGroupAssignment_Group21Context>();
+    
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

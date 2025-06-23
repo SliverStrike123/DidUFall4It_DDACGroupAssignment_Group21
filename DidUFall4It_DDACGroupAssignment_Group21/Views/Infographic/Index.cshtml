@@ -1,0 +1,36 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1 class="mb-4">Infographic Dashboard</h1>
+
+<div class="container">
+    <div class="row">
+        <!-- Feature 1: Infographic Management -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-primary h-100">
+                <div class="card-header bg-primary text-white">
+                    Infographic Management
+                </div>
+                <div class="card-body">
+                    <p>Create, read, update, and delete infographics with visuals and tips.</p>
+                    <a asp-controller="Infographic" asp-action="InfoHome" class="btn btn-success mb-2">Infographic Design Dashboard</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 2: Performance Insights -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-secondary h-100">
+                <div class="card-header bg-secondary text-white">
+                    Infographic Performance Insights
+                </div>
+                <div class="card-body">
+                    <p>Analyze infographic engagement, views, and generate reports.</p>
+                    <a asp-controller="Infographic" asp-action="InsightsHome" class="btn btn-success mb-2">Infographic Insights Dashboard</a><br />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

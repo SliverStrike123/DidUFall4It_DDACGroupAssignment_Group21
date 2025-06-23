@@ -1,21 +1,47 @@
-using System.Diagnostics;
+using DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Data;
 using DidUFall4It_DDACGroupAssignment_Group21.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly UserManager<DidUFall4It_DDACGroupAssignment_Group21User> _userManager;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, UserManager<DidUFall4It_DDACGroupAssignment_Group21User> userManager)
         {
             _logger = logger;
+            _userManager = userManager;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userManager.GetUserAsync(User);
+
+                if (user != null)
+                {
+                    if (string.IsNullOrEmpty(user.UserRole))
+                        return RedirectToAction("Index", "Home"); // Default fallback
+                    else if (user.UserRole == "Infographic")
+                        return RedirectToAction("Index", "Infographic");
+                    else
+                        return Redirect("~/Identity/Account/Manage/Index");
+                }
+                else
+                {
+                    return View();
+                }
+            }
+            else
+            {
+                return View();
+            }
+
         }
 
         public IActionResult Privacy()
