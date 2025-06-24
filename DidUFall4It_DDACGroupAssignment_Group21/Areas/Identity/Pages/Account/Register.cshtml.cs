@@ -53,7 +53,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Pages.Account
          new List<SelectListItem>
          {
          new SelectListItem { Selected =true, Text = "Select Role", Value = ""},
-         new SelectListItem { Selected =true, Text = "Quiz", Value = "Quiz"},
+         new SelectListItem { Selected =true, Text = "QuizMaker", Value = "QuizMaker"},
          new SelectListItem { Selected =true, Text = "Customer", Value = "Customer"},
          new SelectListItem { Selected =true, Text = "Infographic", Value = "Infographic"},
          }, "Value", "Text",1
@@ -159,10 +159,10 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Pages.Account
                     {
                         await _roleManager.CreateAsync(new IdentityRole("User"));
                     }
-                    roleresult = await _roleManager.RoleExistsAsync("Quiz");
+                    roleresult = await _roleManager.RoleExistsAsync("QuizMaker");
                     if (!roleresult)
                     {
-                        await _roleManager.CreateAsync(new IdentityRole("Quiz"));
+                        await _roleManager.CreateAsync(new IdentityRole("QuizMaker"));
                     }
                     await _userManager.AddToRoleAsync(user, Input.userrole);
                     //_logger.LogInformation("User created a new account with password.");
