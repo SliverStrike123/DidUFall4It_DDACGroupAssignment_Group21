@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using DidUFall4It_DDACGroupAssignment_Group21.Models;
 
 namespace DidUFall4It_DDACGroupAssignment_Group21.Data;
 
@@ -19,4 +20,5 @@ public class DidUFall4It_DDACGroupAssignment_Group21Context : IdentityDbContext<
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
     }
+    public DbSet<InfographicModel> Infographics { get; set; }
 }

@@ -17,5 +17,15 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             return View();
         }
 
+        public IActionResult InfoCreate()
+        {
+            return View();
+        }
+
+        public IActionResult InfoList()
+        {
+            return View();
+        }
+
     }
 }
