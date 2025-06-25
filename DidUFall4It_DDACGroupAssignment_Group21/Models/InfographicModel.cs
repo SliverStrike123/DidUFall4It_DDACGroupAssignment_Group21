@@ -13,9 +13,9 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Models
         [DataType(DataType.MultilineText)]
         public string Description { get; set; }
 
-        public string Tips { get; set; }
+        public string? Tips { get; set; }
 
-        public string ImagePath { get; set; }
+        public string? ImagePath { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     
