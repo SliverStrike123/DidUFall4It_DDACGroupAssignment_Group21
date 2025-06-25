@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using DidUFall4It_DDACGroupAssignment_Group21.Models;
 using DidUFall4It_DDACGroupAssignment_Group21.Data;
-
 namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 {
     public class InfographicController : Controller
@@ -33,9 +32,23 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             return View();
         }
 
-        public IActionResult InfoList()
+        public async Task<IActionResult> InfoList()
         {
-            return View();
+            var infographics = await _context.Infographics
+            .OrderByDescending(i => i.CreatedAt)
+            .ToListAsync();
+
+            var model = new InfographicViewModel(infographics);
+            return View(model);
+        }
+        public async Task<IActionResult> InfoEdit(int id)
+        {
+            var infographic = await _context.Infographics.FindAsync(id);
+            if (infographic == null)
+            {
+                return NotFound();
+            }
+            return View(infographic);
         }
 
         [HttpPost]
@@ -65,6 +78,86 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> InfoEdit(int id, InfographicModel model, IFormFile? ImageFile)
+        {
+            if (id != model.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Update fields
+                    var existing = await _context.Infographics.FindAsync(id);
+                    if (existing == null) return NotFound();
+
+                    existing.Title = model.Title;
+                    existing.Description = model.Description;
+                    existing.Tips = model.Tips;
+
+                    // Optional: handle new image
+                    if (ImageFile != null && ImageFile.Length > 0)
+                    {
+                        var fileName = Path.GetFileName(ImageFile.FileName);
+                        var savePath = Path.Combine("wwwroot/uploads", fileName);
+
+                        using (var stream = new FileStream(savePath, FileMode.Create))
+                        {
+                            await ImageFile.CopyToAsync(stream);
+                        }
+
+                        existing.ImagePath = "/uploads/" + fileName;
+                    }
+
+                    _context.Update(existing);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("InfoList");
+                }
+                catch
+                {
+                    return View(model);
+                }
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> InfoDeleteConfirmed(int id)
+        {
+            var infographic = await _context.Infographics.FindAsync(id);
+            if (infographic == null)
+            {
+                return NotFound();
+            }
+            if (!string.IsNullOrEmpty(infographic.ImagePath))
+            {
+                var imagePath = Path.Combine("wwwroot", infographic.ImagePath.TrimStart('/'));
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+            }
+
+            _context.Infographics.Remove(infographic);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("InfoList");
+        }
+
+        public async Task<IActionResult> InfoGetList()
+        {
+            var list = await _context.Infographics
+                .OrderByDescending(i => i.CreatedAt)
+                .ToListAsync();
+
+            return View(list);
         }
     }
 }

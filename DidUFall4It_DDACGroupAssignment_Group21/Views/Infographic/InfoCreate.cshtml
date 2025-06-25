@@ -8,24 +8,24 @@
 <h2>Create Infographic</h2>
 
 <form asp-action="InfoCreate" enctype="multipart/form-data" method="post">
-    <div class="form-group">
+    <div class="form-group mt-3">
         <label asp-for="Title"></label>
         <input asp-for="Title" class="form-control" />
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
-    <div class="form-group">
+    <div class="form-group mt-3">
         <label asp-for="Description"></label>
         <textarea asp-for="Description" class="form-control" rows="4"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
-    <div class="form-group">
+    <div class="form-group mt-3">
         <label asp-for="Tips">Tips (optional)</label>
         <input asp-for="Tips" class="form-control" />
     </div>
-    <div class="form-group">
+    <div class="form-group mt-3">
         <label for="ImageFile">Upload Image</label>
         <input type="file" name="ImageFile" class="form-control" />
     </div>
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" asp-controller="Infographic" class="btn btn-secondary">Back</a>
+    <button type="submit" class="btn btn-primary mt-3">Save</button>
+    <a asp-action="Index" asp-controller="Infographic" class="btn btn-secondary mt-3">Back</a>
 </form>

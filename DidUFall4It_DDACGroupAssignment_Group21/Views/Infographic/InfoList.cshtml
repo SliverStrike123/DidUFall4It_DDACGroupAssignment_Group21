@@ -1,7 +1,43 @@
-﻿
+﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.InfographicViewModel
+
 @{
-    ViewData["Title"] = "InfoList";
+    ViewData["Title"] = "Infographic List";
 }
 
-<h1>InfoList</h1>
+<h2>Infographic List</h2>
 
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Date Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if(Model.GetTotalCount() == 0)
+        {
+            <tr>
+                <td colspan="3" class="text-center text-muted">No Infographics Have Been Created</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model.GetList())
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>@item.CreatedAt.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        <a asp-action="InfoEdit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Edit</a>
+                        <form asp-action="InfoDeleteConfirmed" asp-route-id="@item.Id" method="post" style="display:inline;"
+                              onsubmit="return confirm('Are you sure you want to delete this infographic?');">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+    <a asp-controller="Infographic" asp-action="InfoHome" class="btn btn-secondary">Back</a>
+</table>

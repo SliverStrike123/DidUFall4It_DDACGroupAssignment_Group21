@@ -1,0 +1,43 @@
+﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.InfographicModel
+@{
+    ViewData["Title"] = "InfoEdit";
+}
+
+<h1>InfoEdit</h1>
+
+<form asp-action="InfoEdit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group">
+        <label asp-for="Title"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Tips"></label>
+        <textarea asp-for="Tips" class="form-control"></textarea>
+        <span asp-validation-for="Tips" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Current Image:</label><br />
+        <img src="@Model.ImagePath" alt="Current Image" style="max-width: 200px;" />
+    </div>
+
+    <div class="form-group">
+        <label for="ImageFile">Replace Image (optional)</label>
+        <input type="file" name="ImageFile" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a asp-action="InfoList" class="btn btn-secondary">Cancel</a>
+</form>

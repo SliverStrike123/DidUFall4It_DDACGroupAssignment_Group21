@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DidUFall4It_DDACGroupAssignment_Group21.Models
 {
@@ -18,6 +19,9 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Models
         public string? ImagePath { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-    
+
+        [NotMapped]
+        public IFormFile? ImageFile { get; set; }
     }
+
 }
