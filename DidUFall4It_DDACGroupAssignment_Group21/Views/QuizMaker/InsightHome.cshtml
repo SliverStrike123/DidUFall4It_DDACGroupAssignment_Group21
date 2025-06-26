@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "InsightHome";
+}
+
+<h1>InfoHome</h1>
+
+<div class="container mt-5">
+    <div class="text-center">
+        <h2 class="mb-4">Quiz Insight Main Menu</h2>
+        <div class="d-grid gap-3 col-6 mx-auto">
+            <a asp-controller="QuizMaker" asp-action="InsightCreate" class="btn btn-success btn-lg">Create Insight</a>
+            <a asp-controller="QuizMaker" asp-action="InsightList" class="btn btn-secondary btn-lg">View Created Insight</a>
+            <a asp-controller="QuizMaker" asp-action="Index" class="btn btn-outline-secondary btn-lg">Back</a>
+        </div>
+    </div>
+</div>

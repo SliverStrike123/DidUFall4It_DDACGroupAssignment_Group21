@@ -1,5 +1,35 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Index";
 }
+
+<h1 class="mb-4">Quiz Maker Dashboard</h1>
+
+<div class="container">
+    <div class="row">
+        <!-- Feature 1: Quiz Management -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-primary h-100">
+                <div class="card-header bg-primary text-white">
+                    Quiz Management
+                </div>
+                <div class="card-body">
+                    <p>Create, read, update, and delete quiz.</p>
+                    <a asp-controller="QuizMaker" asp-action="QuizHome" class="btn btn-success mb-2">Quiz Maker Main Menu</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 2: Performance Insights -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-secondary h-100">
+                <div class="card-header bg-secondary text-white">
+                    Quiz Insights
+                </div>
+                <div class="card-body">
+                    <p>err do smth im not too sure yet.</p>
+                    <a asp-controller="QuizMaker" asp-action="InsightHome" class="btn btn-success mb-2">Quiz Insight Dashboard</a><br />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
