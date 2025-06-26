@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "General User Dashboard";
+}
+
+<h1 class="mb-4">Welcome to Your Learning Dashboard</h1>
+
+<div class="container">
+    <div class="row">
+
+        <!-- Feature 1: Scam Quiz Interaction -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-primary h-100 shadow">
+                <div class="card-header bg-primary text-white">
+                    Scam Quiz Interaction
+                </div>
+                <div class="card-body">
+                    <p>Attempt scam awareness quizzes and manage your quiz history.</p>
+                    <a asp-controller="Quiz" asp-action="Submit" class="btn btn-success mb-2">Take a Quiz</a><br />
+                    <a asp-controller="Quiz" asp-action="History" class="btn btn-outline-info">View Quiz History</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 2: Infographic Engagement -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-secondary h-100 shadow">
+                <div class="card-header bg-secondary text-white">
+                    Infographic Engagement
+                </div>
+                <div class="card-body">
+                    <p>Browse scam-related infographics and leave your feedback.</p>
+                    <a asp-controller="Infographic" asp-action="ViewAll" class="btn btn-success mb-2">View Infographics</a><br />
+                    <a asp-controller="Infographic" asp-action="MyComments" class="btn btn-outline-info">My Feedback</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 3: Personal Progress Tracking -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-info h-100 shadow">
+                <div class="card-header bg-info text-white">
+                    Personal Progress Tracking
+                </div>
+                <div class="card-body">
+                    <p>Track your goals and view your learning progress.</p>
+                    <a asp-controller="Progress" asp-action="Create" class="btn btn-success mb-2">Set Learning Goal</a><br />
+                    <a asp-controller="Progress" asp-action="List" class="btn btn-outline-info">View Progress</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
