@@ -1,0 +1,31 @@
+﻿
+@{
+    ViewData["Title"] = "History";
+
+}
+<table class="table">
+    <thead><tr><th>Question</th><th>Answer</th><th>Notes</th><th>Actions</th></tr></thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Question</td>
+                <td>@item.SelectedAnswer</td>
+                <td>
+                    <form asp-action="UpdateNotes" method="post">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <input name="notes" value="@item.Notes" class="form-control" />
+                        <button class="btn btn-sm btn-info">Update</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <button class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

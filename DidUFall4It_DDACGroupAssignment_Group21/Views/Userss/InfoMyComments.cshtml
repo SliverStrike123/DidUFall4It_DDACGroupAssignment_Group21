@@ -1,0 +1,22 @@
+﻿
+@{
+    ViewData["Title"] = "InfoMyComments";
+}
+
+@model List<InfographicFeedback>
+<h2>My Comments</h2>
+@foreach (var item in Model)
+{
+    <div class="mb-3">
+        <form asp-action="Update" method="post" class="d-flex gap-2">
+            <input type="hidden" name="id" value="@item.Id" />
+            <input name="comment" value="@item.Comment" class="form-control" />
+            <button class="btn btn-sm btn-info">Update</button>
+        </form>
+        <form asp-action="Delete" method="post" class="mt-1">
+            <input type="hidden" name="id" value="@item.Id" />
+            <button class="btn btn-sm btn-danger">Delete</button>
+        </form>
+    </div>
+}
+

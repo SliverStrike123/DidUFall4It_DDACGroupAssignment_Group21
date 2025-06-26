@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewData["Title"] = "ProgressList";
+}
+
+@model List<LearningGoal>
+<h2>My Learning Goals</h2>
+@foreach (var item in Model)
+{
+    <div class="border p-2 mb-2">
+        <strong>@item.Goal</strong>
+        <span class="badge bg-@(item.IsCompleted ? "success" : "warning")">
+            @(item.IsCompleted ? "Completed" : "In Progress")
+        </span><br />
+        <small>Created: @item.CreatedAt.ToShortDateString()</small>
+        @if (!item.IsCompleted)
+        {
+            <form asp-action="MarkComplete" method="post" class="d-inline">
+                <input type="hidden" name="id" value="@item.Id" />
+                <button class="btn btn-sm btn-info">Mark Complete</button>
+            </form>
+        }
+        <form asp-action="Delete" method="post" class="d-inline">
+            <input type="hidden" name="id" value="@item.Id" />
+            <button class="btn btn-sm btn-danger">Delete</button>
+        </form>
+    </div>
+}

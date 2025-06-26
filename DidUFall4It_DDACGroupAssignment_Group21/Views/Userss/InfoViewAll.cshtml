@@ -1,0 +1,15 @@
+﻿
+@{
+    ViewData["Title"] = "InfoViewAll";
+}
+
+@model List<InfographicFeedback>
+<h2>All Infographic Feedback</h2>
+@foreach (var item in Model)
+{
+    <div class="border p-2 mb-2">
+        <strong>@item.InfographicTitle</strong><br />
+        <em>@item.Comment</em> - @item.PostedAt.ToShortDateString()
+    </div>
+}
+
