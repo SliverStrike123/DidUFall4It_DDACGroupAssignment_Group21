@@ -21,9 +21,9 @@
                 <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.customerfullname" class="form-control" />
-                <label asp-for="Input.customerfullname"></label>
-                <span asp-validation-for="Input.customerfullname" class="text-danger"></span>
+                <input asp-for="Input.name" class="form-control" />
+                <label asp-for="Input.name"></label>
+                <span asp-validation-for="Input.name" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.age" class="form-control" />
@@ -34,11 +34,6 @@
                 <input asp-for="Input.DoB" class="form-control" />
                 <label asp-for="Input.DoB"></label>
                 <span asp-validation-for="Input.DoB" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Address" class="form-control" />
-                <label asp-for="Input.Address"></label>
-                <span asp-validation-for="Input.Address" class="text-danger"></span>
             </div>
             <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
         </form>

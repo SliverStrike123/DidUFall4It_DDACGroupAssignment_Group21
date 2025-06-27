@@ -54,7 +54,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Pages.Account
          {
          new SelectListItem { Selected =true, Text = "Select Role", Value = ""},
          new SelectListItem { Selected =true, Text = "QuizMaker", Value = "QuizMaker"},
-         new SelectListItem { Selected =true, Text = "Customer", Value = "Customer"},
+         new SelectListItem { Selected =true, Text = "User", Value = "User"},
          new SelectListItem { Selected =true, Text = "Infographic", Value = "Infographic"},
          }, "Value", "Text",1
          );
@@ -112,10 +112,10 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Pages.Account
             public string ConfirmPassword { get; set; }
             [Required(ErrorMessage = "You must enter the name first before submitting your form!")]
             [StringLength(256, ErrorMessage = "You must enter the value between 6 - 256 chars", MinimumLength = 6)]
-            [Display(Name = "Customer Full Name")] //label
-            public string CustomerFullName { get; set; }
+            [Display(Name = "UserName")] //label
+            public string name { get; set; }
             [Required]
-            [Display(Name = "Customer DOB")]
+            [Display(Name = "DOB")]
             [DataType(DataType.Date)]
             public DateTime DoB { get; set; }
 
@@ -139,8 +139,8 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
                 user.UserRole = Input.userrole;
-                user.CustomerFullName = Input.CustomerFullName;
-                user.CustomerDOB = Input.DoB;
+                user.Name = Input.name;
+                user.DOB = Input.DoB;
                 user.EmailConfirmed = true;
                 user.UserRole = Input.userrole;
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);

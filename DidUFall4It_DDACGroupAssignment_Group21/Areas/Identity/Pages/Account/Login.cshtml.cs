@@ -130,6 +130,8 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Pages.Account
                             return RedirectToAction("Index", "Infographic");
                         else if (userrole.Equals("QuizMaker"))
                             return RedirectToAction("Index", "QuizMaker");
+                        else if (userrole.Equals("User"))
+                            return Redirect("~/View/Userss/Index");
                         else
                             return Redirect("~/Identity/Account/Manage/Index");
                     }

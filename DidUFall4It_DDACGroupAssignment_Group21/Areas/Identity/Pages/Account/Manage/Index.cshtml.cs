@@ -61,8 +61,8 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Pages.Account.M
             public string PhoneNumber { get; set; }
             [Required(ErrorMessage = "You must enter the name first before submitting your form!")]
             [StringLength(256, ErrorMessage = "You must enter the value between 6 - 256 chars", MinimumLength = 6)]
-            [Display(Name = "Your Full Name")] //label
-            public string customerfullname { get; set; }
+            [Display(Name = "Your Username")] //label
+            public string name { get; set; }
             [Required]
             [Display(Name = "Your DOB")]
             [DataType(DataType.Date)]
@@ -71,10 +71,6 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Pages.Account.M
             [Range(18, 100, ErrorMessage = "You must be 18 years old when register this member!")]
             [Display(Name = "Your Age")] //label
             public int age { get; set; }
-            [Required]
-            [DataType(DataType.MultilineText)]
-            [Display(Name = "Your Address")]
-            public string Address { get; set; }
         }
 
         private async Task LoadAsync(DidUFall4It_DDACGroupAssignment_Group21User user)
@@ -87,10 +83,9 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Pages.Account.M
             Input = new InputModel
             {
                 PhoneNumber = phoneNumber,
-                customerfullname = user.CustomerFullName,
-                age = user.CustomerAge,
-                Address = user.CustomerAddress,
-                DoB = user.CustomerDOB
+                name = user.Name,
+                age = user.Age,
+                DoB = user.DOB
             };
         }
 
@@ -130,21 +125,17 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Pages.Account.M
                     return RedirectToPage();
                 }
             }
-            if (Input.customerfullname != user.CustomerFullName)
+            if (Input.name != user.UserName)
             {
-                user.CustomerFullName = Input.customerfullname;
+                user.UserName = Input.name;
             }
-            if (Input.DoB != user.CustomerDOB)
+            if (Input.DoB != user.DOB)
             {
-                user.CustomerDOB = Input.DoB;
+                user.DOB = Input.DoB;
             }
-            if (Input.Address != user.CustomerAddress)
+            if (Input.age != user.Age)
             {
-                user.CustomerAddress = Input.Address;
-            }
-            if (Input.age != user.CustomerAge)
-            {
-                user.CustomerAge = Input.age;
+                user.Age = Input.age;
             }
             await _userManager.UpdateAsync(user);
 

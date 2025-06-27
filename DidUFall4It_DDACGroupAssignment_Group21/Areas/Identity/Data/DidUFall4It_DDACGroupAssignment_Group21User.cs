@@ -10,13 +10,11 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Data;
 public class DidUFall4It_DDACGroupAssignment_Group21User : IdentityUser
 {
     [PersonalData]
-    public string? CustomerFullName { get; set; }
+    public string? Name { get; set; }
     [PersonalData]
-    public int CustomerAge { get; set; }
+    public int Age { get; set; }
     [PersonalData]
-    public string? CustomerAddress { get; set; }
-    [PersonalData]
-    public DateTime CustomerDOB { get; set; }
+    public DateTime DOB { get; set; }
     [PersonalData]
     public string? UserRole { get; set; }
 }
