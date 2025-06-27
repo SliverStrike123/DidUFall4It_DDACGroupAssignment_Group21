@@ -21,4 +21,7 @@ public class DidUFall4It_DDACGroupAssignment_Group21Context : IdentityDbContext<
         // Add your customizations after calling base.OnModelCreating(builder);
     }
     public DbSet<InfographicModel> Infographics { get; set; }
+    public DbSet<QuizModel> Quizzes { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<QuizReview> QuizReviews { get; set; }
 }
