@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "UserHome";
+}
+
+<h1>User Dashboard</h1>
+<div class="container mt-5">
+    <div class="text-center">
+        <h2 class="mb-4">General User Main Menu</h2>
+        <div class="d-grid gap-3 col-6 mx-auto">
+            <a asp-controller="Quiz" asp-action="Index" class="btn btn-primary btn-lg">Scam Quiz</a>
+            <a asp-controller="InfographicControllerUser" asp-action="ViewAll" class="btn btn-success btn-lg">Infographic Feedback</a>
+            <a asp-controller="Progress" asp-action="List" class="btn btn-info btn-lg">Progress Tracking</a>
+        </div>
+    </div>
+</div>
