@@ -1,0 +1,58 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model DidUFall4It_DDACGroupAssignment_Group21.Models.Question
+
+@{
+    ViewData["Title"] = "Create Question";
+    var quizzes = ViewBag.Quizzes as List<DidUFall4It_DDACGroupAssignment_Group21.Models.QuizModel>;
+}
+
+<h1>Create Question</h1>
+
+<form asp-controller="QuizMaker" asp-action="QuestionCreate" method="post">
+    <div class="mb-3">
+        <label asp-for="QuestionId" class="form-label">Question ID</label>
+        <input asp-for="QuestionId" class="form-control" />
+        <span asp-validation-for="QuestionId" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="QuestionText" class="form-label">Question Text</label>
+        <input asp-for="QuestionText" class="form-control" />
+        <span asp-validation-for="QuestionText" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Options (comma separated)</label>
+        <input name="OptionsString" class="form-control" placeholder="e.g. Option1,Option2,Option3" />
+        <div class="form-text">Enter all options separated by commas.</div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Correct Answer (index, starting from 0)</label>
+        <input asp-for="Answer" type="number" class="form-control" min="0" />
+        <span asp-validation-for="Answer" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Score" class="form-label">Score</label>
+        <input asp-for="Score" type="number" class="form-control" min="0" />
+        <span asp-validation-for="Score" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Assign to Quiz (optional)</label>
+        <select name="SelectedQuizId" class="form-select">
+            <option value="">-- Do not assign --</option>
+            @if (quizzes != null)
+            {
+                foreach (var quiz in quizzes)
+                {
+                    <option value="@quiz.QuizModelId">@quiz.Title</option>
+                }
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Create Question</button>
+    <a asp-controller="QuizMaker" asp-action="QuizCreate" class="btn btn-secondary">Back to Quiz Create</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

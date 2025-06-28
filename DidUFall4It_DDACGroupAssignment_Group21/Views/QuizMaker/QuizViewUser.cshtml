@@ -1,0 +1,29 @@
+﻿@model List<DidUFall4It_DDACGroupAssignment_Group21.Models.QuizModel>
+
+@{
+    ViewData["Title"] = "Available Quizzes";
+}
+
+<h1>Available Quizzes</h1>
+
+@if (Model != null && Model.Any())
+{
+    <ul class="list-group">
+        @foreach (var quiz in Model)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>@quiz.Title</span>
+                <a asp-controller="QuizMaker"
+                   asp-action="QuestionViewUser" @* assuming the user needs their own controller to view/answer questions *@
+                   asp-route-quizModelId="@quiz.QuizModelId"
+                   class="btn btn-primary btn-sm">
+                    View Questions
+                </a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <div class="alert alert-info mt-3">No quizzes are currently available.</div>
+}
