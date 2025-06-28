@@ -25,11 +25,6 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             return View();
         }
 
-        public IActionResult QuizList()
-        {
-            return View();
-        }
-
         public IActionResult QuizCreate()
         {
             return View();
@@ -39,13 +34,45 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             ViewBag.Quizzes = _context.Quizzes.ToList();
             return View();
         }
-        public IActionResult QuizEdit()
+        public IActionResult QuizEdit(int? SelectedQuizId)
         {
-            return View();
+            var quizzes = _context.Quizzes.ToList();
+            var allQuestions = _context.Questions.ToList();
+            QuizModel? selectedQuiz = null;
+
+            if (SelectedQuizId.HasValue)
+            {
+                selectedQuiz = _context.Quizzes
+                    .Include(q => q.QuestionIds) // or QuizQuestions, depending on your model
+                    .FirstOrDefault(q => q.QuizModelId == SelectedQuizId.Value);
+            }
+
+            var model = new QuizEdit
+            {
+                Quizzes = quizzes,
+                SelectedQuiz = selectedQuiz,
+                AllQuestions = allQuestions
+            };
+
+            return View(model);
         }
-        public IActionResult QuestionEdit()
+        public IActionResult QuestionEdit(int? SelectedQuestionId)
         {
-            return View();
+            var questions = _context.Questions.ToList();
+            Question? selectedQuestion = null;
+
+            if (SelectedQuestionId.HasValue)
+            {
+                selectedQuestion = _context.Questions.FirstOrDefault(q => q.QuestionId == SelectedQuestionId.Value);
+            }
+
+            var model = new QuestionEdit
+            {
+                Questions = questions,
+                SelectedQuestion = selectedQuestion
+            };
+
+            return View(model);
         }
         public IActionResult InsightList()
         {
@@ -62,6 +89,60 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         public IActionResult InsightEdit()
         {
             return View();
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult QuizCreate(QuizModel model, List<int>? QuestionIds)
+        {
+            // Assign selected questions to the quiz
+            if (QuestionIds != null && QuestionIds.Any())
+            {
+                model.QuestionIds = _context.Questions
+                    .Where(q => QuestionIds.Contains(q.QuestionId))
+                    .ToList();
+            }
+
+            _context.Quizzes.Add(model);
+            _context.SaveChanges();
+
+            return RedirectToAction("QuizList");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult QuizEdit(int QuizModelId, string Title, List<int> QuestionIds)
+        {
+            var quiz = _context.Quizzes
+                .Include(q => q.QuestionIds)
+                .FirstOrDefault(q => q.QuizModelId == QuizModelId);
+
+            if (quiz == null)
+                return NotFound();
+
+            quiz.Title = Title;
+
+            // Remove all current questions from this quiz
+            foreach (var q in quiz.QuestionIds)
+            {
+                q.QuizModelId = null;
+            }
+
+            // Assign new questions to this quiz
+            var selectedQuestions = _context.Questions
+                .Where(q => QuestionIds.Contains(q.QuestionId))
+                .ToList();
+
+            foreach (var q in selectedQuestions)
+            {
+                q.QuizModelId = quiz.QuizModelId;
+            }
+
+            quiz.QuestionIds = selectedQuestions;
+            _context.SaveChanges();
+
+            return RedirectToAction("QuizEdit", new { SelectedQuizId = QuizModelId });
         }
 
         [HttpPost]
@@ -108,22 +189,25 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult QuizCreate(QuizModel model, List<int>? QuestionIds)
+        public IActionResult QuestionEdit(int QuestionId, string QuestionText, string OptionOne, string OptionTwo, string OptionThree, string OptionFour, int Answer, int Score)
         {
-            // Assign selected questions to the quiz
-            if (QuestionIds != null && QuestionIds.Any())
-            {
-                model.QuestionIds = _context.Questions
-                    .Where(q => QuestionIds.Contains(q.QuestionId))
-                    .ToList();
-            }
+            var question = _context.Questions.FirstOrDefault(q => q.QuestionId == QuestionId);
+            if (question == null)
+                return NotFound();
 
-            _context.Quizzes.Add(model);
+            // Update properties
+            question.QuestionText = QuestionText;
+            question.OptionOne = OptionOne;
+            question.OptionTwo = OptionTwo;
+            question.OptionThree = OptionThree;
+            question.OptionFour = OptionFour;
+            question.Answer = Answer;
+            question.Score = Score;
+
             _context.SaveChanges();
 
-            return RedirectToAction("QuizList");
+            // Optionally, redirect back to the edit page with the same question selected
+            return RedirectToAction("QuestionEdit", new { SelectedQuestionId = QuestionId });
         }
-
-
     }
 }

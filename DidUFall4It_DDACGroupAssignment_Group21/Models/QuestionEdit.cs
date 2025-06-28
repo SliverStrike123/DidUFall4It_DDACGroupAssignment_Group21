@@ -2,7 +2,7 @@
 {
     public class QuestionEdit
     {
-        public List<Question>? Questions { get; set; }
+        public List<Question>? Questions { get; set; } = new();
         public Question? SelectedQuestion { get; set; }
     }
 }

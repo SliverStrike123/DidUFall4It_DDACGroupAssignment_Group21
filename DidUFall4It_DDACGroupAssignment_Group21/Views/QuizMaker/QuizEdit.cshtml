@@ -1,26 +1,26 @@
-﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.QuizEdit  
+﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.QuizEdit
 
-@{  
-    ViewData["Title"] = "Quiz Edit";  
-}  
+@{
+    ViewData["Title"] = "Quiz Edit";
+}
 
-<h1>Edit Quiz</h1>  
+<h1>Edit Quiz</h1>
 
-<!-- Quiz selection form -->  
-<form asp-controller="QuizMaker" asp-action="QuizEdit" method="get" class="mb-4">  
-    <div class="mb-3">  
-        <label for="SelectedQuizId" class="form-label">Select Quiz to Edit</label>  
-        <select id="SelectedQuizId" name="SelectedQuizId" class="form-select" onchange="this.form.submit()">  
-            <option value="">-- Select Quiz --</option>  
-            @foreach (var quiz in Model.Quizzes)  
-            {  
-                <option value="@quiz.QuizModelId" selected="@(quiz.QuizModelId == Model.SelectedQuiz?.QuizModelId)">  
-                    @quiz.Title  
-                </option>  
-            }  
-        </select>  
-    </div>  
-</form>  
+<!-- Quiz selection form -->
+<form asp-controller="QuizMaker" asp-action="QuizEdit" method="get" class="mb-4">
+    <div class="mb-3">
+        <label for="SelectedQuizId" class="form-label">Select Quiz to Edit</label>
+        <select id="SelectedQuizId" name="SelectedQuizId" class="form-select" onchange="this.form.submit()">
+            <option value="">-- Select Quiz --</option>
+            @foreach (var quiz in Model.Quizzes)
+            {
+                <option value="@quiz.QuizModelId" selected="@(quiz.QuizModelId == Model.SelectedQuiz?.QuizModelId)">
+                    @quiz.Title
+                </option>
+            }
+        </select>
+    </div>
+</form>
 
 @if (Model.SelectedQuiz != null)
 {
@@ -56,8 +56,6 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a asp-controller="QuizMaker" asp-action="QuizHome" class="btn btn-secondary">Back</a>
-        <a asp-controller="QuizMaker" asp-action="QuestionEdit" class="btn btn-outline-success">Edit Questions</a>
     </form>
     <form asp-controller="QuizMaker" asp-action="DeleteQuiz" method="post" class="mt-3">
         @Html.AntiForgeryToken()
@@ -72,3 +70,9 @@ else
 {
     <div class="alert alert-info">Please select a quiz to edit.</div>
 }
+
+<!-- Navigation buttons always visible -->
+<div class="mt-4">
+    <a asp-controller="QuizMaker" asp-action="QuizHome" class="btn btn-secondary">Back</a>
+    <a asp-controller="QuizMaker" asp-action="QuestionEdit" class="btn btn-outline-success">Edit Questions</a>
+</div>
