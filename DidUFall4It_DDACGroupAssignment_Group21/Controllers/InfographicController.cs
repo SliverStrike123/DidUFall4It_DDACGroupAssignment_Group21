@@ -22,9 +22,39 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         {
             return View();
         }
-        public IActionResult InsightsHome()
+
+        public IActionResult InfographicFeedbacks()
         {
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GenerateInsights(string selectedMetric)
+        {
+            if (string.IsNullOrEmpty(selectedMetric)) return RedirectToAction("Insights");
+
+            var feedbacks = await _context.InfographicFeedback.ToListAsync();
+
+            double average = selectedMetric switch
+            {
+                "InformativeRating" => feedbacks.Average(f => f.InformativeRating),
+                "EngagementRating" => feedbacks.Average(f => f.EngagementRating),
+                "ClarityRating" => feedbacks.Average(f => f.ClarityRating),
+                "RelevanceRating" => feedbacks.Average(f => f.RelevanceRating),
+                _ => 0
+            };
+
+            var recentComments = feedbacks
+                .Where(f => !string.IsNullOrWhiteSpace(f.Comment))
+                .OrderByDescending(f => f.PostedAt)
+                .Take(5)
+                .ToList();
+
+            ViewBag.MetricAverage = average.ToString("0.00");
+            ViewBag.SelectedMetric = selectedMetric.Replace("Rating", "");
+            ViewBag.RecentComments = recentComments;
+
+            return View("InfographicFeedbacks");
         }
 
         public IActionResult InfoCreate()
