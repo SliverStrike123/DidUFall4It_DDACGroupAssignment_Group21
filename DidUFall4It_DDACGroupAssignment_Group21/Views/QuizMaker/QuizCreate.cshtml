@@ -1,14 +1,38 @@
-﻿@{
+﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.QuizModel
+
+@{
     ViewData["Title"] = "Quiz Create";
+    var questions = ViewBag.Questions as List<DidUFall4It_DDACGroupAssignment_Group21.Models.Question>;
 }
 
-<h1>InfoHome</h1>
+<h1>Create Quiz</h1>
 
-<div class="container mt-5">
-    <div class="text-center">
-        <h2 class="mb-4">Quiz Create</h2>
-        <div class="d-grid gap-3 col-6 mx-auto">
-            <a asp-controller="QuizMaker" asp-action="QuizHome" class="btn btn-outline-secondary btn-lg">Back</a>
-        </div>
+<form asp-controller="QuizMaker" asp-action="QuizCreate" method="post">
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label">Quiz Title</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
     </div>
-</div>
+
+    <div class="mb-3">
+        <label class="form-label">Select Questions to Include</label>
+        <select name="QuestionIds" class="form-select" multiple size="8">
+            @if (questions != null)
+            {
+                foreach (var q in questions)
+                {
+                    <option value="@q.QuestionId">@q.QuestionText</option>
+                }
+            }
+        </select>
+        <div class="form-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple questions.</div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Quiz</button>
+    <a asp-controller="QuizMaker" asp-action="QuizHome" class="btn btn-secondary">Back</a>
+    <a asp-controller="QuizMaker" asp-action="QuestionCreate" class="btn btn-outline-success">Add New Question</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
