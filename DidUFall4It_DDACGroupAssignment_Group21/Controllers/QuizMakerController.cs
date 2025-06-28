@@ -209,5 +209,45 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             // Optionally, redirect back to the edit page with the same question selected
             return RedirectToAction("QuestionEdit", new { SelectedQuestionId = QuestionId });
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteQuiz(int QuizModelId)
+        {
+            var quiz = _context.Quizzes
+                .Include(q => q.QuestionIds)
+                .FirstOrDefault(q => q.QuizModelId == QuizModelId);
+
+            if (quiz == null)
+                return NotFound();
+
+            // Optionally, remove related questions or set their QuizModelId to null
+            foreach (var question in quiz.QuestionIds)
+            {
+                question.QuizModelId = null;
+            }
+
+            _context.Quizzes.Remove(quiz);
+            _context.SaveChanges();
+
+            // Redirect to QuizHome instead of QuizList
+            return RedirectToAction("QuizEdit");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteQuestion(int QuestionId)
+        {
+            var question = _context.Questions.FirstOrDefault(q => q.QuestionId == QuestionId);
+
+            if (question == null)
+                return NotFound();
+
+            _context.Questions.Remove(question);
+            _context.SaveChanges();
+
+            // Redirect to the QuestionEdit page (or wherever you want)
+            return RedirectToAction("QuestionEdit");
+        }
     }
 }

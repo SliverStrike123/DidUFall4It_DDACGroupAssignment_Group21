@@ -14,20 +14,6 @@
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
 
-    <div class="mb-3">
-        <label class="form-label">Select Questions to Include</label>
-        <select name="QuestionIds" class="form-select" multiple size="8">
-            @if (questions != null)
-            {
-                foreach (var q in questions)
-                {
-                    <option value="@q.QuestionId">@q.QuestionText</option>
-                }
-            }
-        </select>
-        <div class="form-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple questions.</div>
-    </div>
-
     <button type="submit" class="btn btn-primary">Create Quiz</button>
     <a asp-controller="QuizMaker" asp-action="QuizHome" class="btn btn-secondary">Back</a>
     <a asp-controller="QuizMaker" asp-action="QuestionCreate" class="btn btn-outline-success">Add New Question</a>
