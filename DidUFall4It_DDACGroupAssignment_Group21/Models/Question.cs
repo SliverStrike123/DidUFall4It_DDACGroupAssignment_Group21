@@ -10,5 +10,9 @@
         public string? OptionFour { get; set; }
         public int? Answer { get; set; }
         public int? Score { get; set; }
+
+        // Foreign key to QuizModel
+        public int? QuizModelId { get; set; }
+        public QuizModel? QuizModel { get; set; }
     }
 }

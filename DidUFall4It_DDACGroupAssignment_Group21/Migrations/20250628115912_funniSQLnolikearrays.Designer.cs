@@ -4,6 +4,7 @@ using DidUFall4It_DDACGroupAssignment_Group21.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DidUFall4It_DDACGroupAssignment_Group21.Migrations
 {
     [DbContext(typeof(DidUFall4It_DDACGroupAssignment_Group21Context))]
-    partial class DidUFall4It_DDACGroupAssignment_Group21ContextModelSnapshot : ModelSnapshot
+    [Migration("20250628115912_funniSQLnolikearrays")]
+    partial class funniSQLnolikearrays
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -196,15 +199,10 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Migrations
                     b.Property<string>("QuestionText")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("QuizModelId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("Score")
                         .HasColumnType("int");
 
                     b.HasKey("QuestionId");
-
-                    b.HasIndex("QuizModelId");
 
                     b.ToTable("Questions");
                 });
@@ -254,6 +252,9 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuizModelId"));
+
+                    b.PrimitiveCollection<string>("QuestionIds")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
@@ -448,15 +449,6 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("DidUFall4It_DDACGroupAssignment_Group21.Models.Question", b =>
-                {
-                    b.HasOne("DidUFall4It_DDACGroupAssignment_Group21.Models.QuizModel", "QuizModel")
-                        .WithMany("QuestionIds")
-                        .HasForeignKey("QuizModelId");
-
-                    b.Navigation("QuizModel");
-                });
-
             modelBuilder.Entity("DidUFall4It_DDACGroupAssignment_Group21.Models.QuizReview", b =>
                 {
                     b.HasOne("DidUFall4It_DDACGroupAssignment_Group21.Models.QuizModel", null)
@@ -517,8 +509,6 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Migrations
 
             modelBuilder.Entity("DidUFall4It_DDACGroupAssignment_Group21.Models.QuizModel", b =>
                 {
-                    b.Navigation("QuestionIds");
-
                     b.Navigation("QuizReviews");
                 });
 #pragma warning restore 612, 618

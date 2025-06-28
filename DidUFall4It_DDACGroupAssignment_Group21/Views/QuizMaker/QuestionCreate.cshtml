@@ -8,11 +8,7 @@
 <h1>Create Question</h1>
 
 <form asp-controller="QuizMaker" asp-action="QuestionCreate" method="post">
-    <div class="mb-3">
-        <label asp-for="QuestionId" class="form-label">Question ID</label>
-        <input asp-for="QuestionId" class="form-control" />
-        <span asp-validation-for="QuestionId" class="text-danger"></span>
-    </div>
+
 
     <div class="mb-3">
         <label asp-for="QuestionText" class="form-label">Question Text</label>

@@ -36,6 +36,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         }
         public IActionResult QuestionCreate()
         {
+            ViewBag.Quizzes = _context.Quizzes.ToList();
             return View();
         }
         public IActionResult QuizEdit()
@@ -93,10 +94,10 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             }
 
             // Assign to quiz if selected
-            //if (SelectedQuizId.HasValue)
-            //{
-            //    model.QuizModelId = SelectedQuizId.Value;
-            //}
+            if (SelectedQuizId.HasValue)
+            {
+                model.QuizModelId = SelectedQuizId.Value;
+            }
 
             _context.Questions.Add(model);
             await _context.SaveChangesAsync();
@@ -105,31 +106,23 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             return RedirectToAction("QuestionCreate");
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public IActionResult DeleteQuiz(int QuizModelId)
-        //{
-        //    var quiz = _context.Quizzes.Find(QuizModelId);
-        //    if (quiz != null)
-        //    {
-        //        _context.Quizzes.Remove(quiz);
-        //        _context.SaveChanges();
-        //    }
-        //    return RedirectToAction("QuizEdit");
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult QuizCreate(QuizModel model, List<int>? QuestionIds)
+        {
+            // Assign selected questions to the quiz
+            if (QuestionIds != null && QuestionIds.Any())
+            {
+                model.QuestionIds = _context.Questions
+                    .Where(q => QuestionIds.Contains(q.QuestionId))
+                    .ToList();
+            }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public IActionResult DeleteQuestion(int QuestionId)
-        //{
-        //    var question = _context.Questions.Find(QuestionId);
-        //    if (question != null)
-        //    {
-        //        _context.Questions.Remove(question);
-        //        _context.SaveChanges();
-        //    }
-        //    return RedirectToAction("QuestionEdit");
-        //}
+            _context.Quizzes.Add(model);
+            _context.SaveChanges();
+
+            return RedirectToAction("QuizList");
+        }
 
 
     }

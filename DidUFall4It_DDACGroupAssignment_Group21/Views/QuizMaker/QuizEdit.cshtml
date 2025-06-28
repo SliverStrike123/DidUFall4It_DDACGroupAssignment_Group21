@@ -38,7 +38,7 @@
             <div>
                 @foreach (var question in Model.AllQuestions)
                 {
-                    var isChecked = Model.SelectedQuiz.QuestionIds.Contains(question.QuestionId);
+                    var isChecked = Model.SelectedQuiz.QuestionIds.Any(q => q.QuestionId == question.QuestionId);
                     <div class="form-check">
                         <input class="form-check-input"
                                type="checkbox"

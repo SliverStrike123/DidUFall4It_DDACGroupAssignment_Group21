@@ -32,12 +32,24 @@
             <input name="QuestionText" class="form-control" value="@Model.SelectedQuestion.QuestionText" />
         </div>
         <div class="mb-3">
-            <label class="form-label">Options (comma separated)</label>
-            <input name="OptionsString" class="form-control" value="@(Model.SelectedQuestion.Options != null ? string.Join(",", Model.SelectedQuestion.Options) : "")" />
+            <label class="form-label">Option One</label>
+            <input name="OptionOne" class="form-control" value="@Model.SelectedQuestion.OptionOne" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Option Two</label>
+            <input name="OptionTwo" class="form-control" value="@Model.SelectedQuestion.OptionTwo" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Option Three</label>
+            <input name="OptionThree" class="form-control" value="@Model.SelectedQuestion.OptionThree" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Option Four</label>
+            <input name="OptionFour" class="form-control" value="@Model.SelectedQuestion.OptionFour" />
         </div>
         <div class="mb-3">
             <label class="form-label">Correct Answer (index, starting from 0)</label>
-            <input name="Answer" type="number" class="form-control" min="0" value="@Model.SelectedQuestion.Answer" />
+            <input name="Answer" type="number" class="form-control" min="0" max="3" value="@Model.SelectedQuestion.Answer" />
         </div>
         <div class="mb-3">
             <label class="form-label">Score</label>
