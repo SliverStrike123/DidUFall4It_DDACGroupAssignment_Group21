@@ -28,6 +28,8 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Models
             }
         }
 
+
+        
         public List<InfographicModel> GetList()
         {
             return InfographicsList;

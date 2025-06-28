@@ -1,0 +1,31 @@
+﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.InfographicModel
+
+@{
+    ViewData["Title"] = "Infographic Details";
+}
+
+<h2>@Model.Title</h2>
+
+<div class="mb-3">
+    <p><strong>Description:</strong></p>
+    <p>@Model.Description</p>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Tips))
+{
+    <div class="mb-3">
+        <p><strong>Tips:</strong></p>
+        <p>@Model.Tips</p>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Model.ImagePath))
+{
+    <div class="mb-3">
+        <img src="@Url.Content(Model.ImagePath)" alt="Infographic Image" style="max-width: 500px;" />
+    </div>
+}
+
+<p><small>Posted on: @Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</small></p>
+
+<a asp-controller="User" asp-action="InfoViewAll" class="btn btn-secondary mt-3">Back to All Infographics</a>

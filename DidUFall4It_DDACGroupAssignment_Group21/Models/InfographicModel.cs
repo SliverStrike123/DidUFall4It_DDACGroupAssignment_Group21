@@ -22,7 +22,10 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Models
 
         [NotMapped]
         public IFormFile? ImageFile { get; set; }
-        public List<InfographicFeedback>? InfograpohicFeedbacks { get; set; }
+        [NotMapped]
+        public List<InfographicFeedback>? InfographicFeedbacks { get; set; }
+        [NotMapped]
+        public bool HasRated { get; set; }
     }
 
 }

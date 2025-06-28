@@ -131,7 +131,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Pages.Account
                         else if (userrole.Equals("QuizMaker"))
                             return RedirectToAction("Index", "QuizMaker");
                         else if (userrole.Equals("User"))
-                            return Redirect("~/View/Userss/Index");
+                            return RedirectToAction("Index", "User");
                         else
                             return Redirect("~/Identity/Account/Manage/Index");
                     }

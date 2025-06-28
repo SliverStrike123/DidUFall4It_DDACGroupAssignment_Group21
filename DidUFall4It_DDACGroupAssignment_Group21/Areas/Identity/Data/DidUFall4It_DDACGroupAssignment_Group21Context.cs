@@ -24,4 +24,5 @@ public class DidUFall4It_DDACGroupAssignment_Group21Context : IdentityDbContext<
     public DbSet<QuizModel> Quizzes { get; set; }
     public DbSet<Question> Questions { get; set; }
     public DbSet<QuizReview> QuizReviews { get; set; }
+    public DbSet<InfographicFeedback> InfographicFeedback { get; set; }
 }

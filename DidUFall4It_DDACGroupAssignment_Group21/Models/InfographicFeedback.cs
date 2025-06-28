@@ -6,7 +6,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Models
     {
         public int Id { get; set; }
         public string UserId { get; set; }
-        public string InfographicTitle { get; set; }
+        public int InfographicId { get; set; }
         public int InformativeRating { get; set; }
         public int EngagementRating { get; set; }
         public int ClarityRating { get; set; }

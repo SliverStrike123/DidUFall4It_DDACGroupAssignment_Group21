@@ -31,6 +31,8 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                         return RedirectToAction("Index", "Infographic");
                     else if (user.UserRole == "QuizMaker")
                         return RedirectToAction("Index", "QuizMaker");
+                    else if (user.UserRole == "User")
+                        return RedirectToAction("Index", "User");
                     else
                         return Redirect("~/Identity/Account/Manage/Index");
                 }

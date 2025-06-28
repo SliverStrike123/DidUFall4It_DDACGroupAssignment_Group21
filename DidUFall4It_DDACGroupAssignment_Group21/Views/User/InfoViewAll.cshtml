@@ -1,15 +1,41 @@
-﻿
+﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.InfographicViewModel
+
 @{
-    ViewData["Title"] = "InfoViewAll";
+    ViewData["Title"] = "All Infographics";
 }
 
-@model List<InfographicFeedback>
-<h2>All Infographic Feedback</h2>
-@foreach (var item in Model)
+<h2 class="mb-4">All Infographics</h2>
+
+@if (Model.GetTotalCount() == 0)
 {
-    <div class="border p-2 mb-2">
-        <strong>@item.InfographicTitle</strong><br />
-        <em>@item.Comment</em> - @item.PostedAt.ToShortDateString()
-    </div>
+    <p>No infographics available.</p>
 }
+else
+{
+    @foreach (var item in Model.GetList())
+    {
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title">@item.Title</h4>
+                <p class="card-text">@item.Description</p>
 
+                <p class="text-muted">
+                    <small>Posted on @item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                </p>
+
+                <div class="d-flex gap-2">
+                    <a asp-controller="User" asp-action="ViewInfo" asp-route-id="@item.Id" class="btn btn-primary">View</a>
+
+                    @if (item.HasRated)
+                    {
+                        <button class="btn btn-secondary" disabled>Rated</button>
+                    }
+                    else
+                    {
+                        <a asp-controller="User" asp-action="Rate" asp-route-id="@item.Id" class="btn btn-success">Rate</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
