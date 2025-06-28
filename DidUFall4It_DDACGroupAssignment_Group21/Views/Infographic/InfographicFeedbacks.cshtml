@@ -1,0 +1,41 @@
+﻿{
+    ViewData["Title"] = "Infographic Feedback";
+}
+
+<h1>Infographic Feedback</h1>
+
+<div class="container mt-4">
+    <form asp-action="GenerateInsights" method="post" class="mb-4">
+        <div class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="metric" class="col-form-label">Select Metric:</label>
+            </div>
+            <div class="col-auto">
+                <select class="form-select" name="selectedMetric" id="metric">
+                    <option value="InformativeRating">Informative</option>
+                    <option value="EngagementRating">Engagement</option>
+                    <option value="ClarityRating">Clarity</option>
+                    <option value="RelevanceRating">Relevance</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Create Insight</button>
+            </div>
+        </div>
+    </form>
+
+    @if (ViewBag.MetricAverage != null)
+    {
+        <h4>Average @ViewBag.SelectedMetric Rating: @ViewBag.MetricAverage</h4>
+
+        <h5 class="mt-4">Recent Feedback Comments:</h5>
+        <ul class="list-group">
+            @foreach (var comment in ViewBag.RecentComments)
+            {
+                <li class="list-group-item">
+                    <strong>@comment.InfographicTitle</strong>: @comment.Comment
+                </li>
+            }
+        </ul>
+    }
+</div>
