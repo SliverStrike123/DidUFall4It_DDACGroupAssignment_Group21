@@ -3,7 +3,7 @@
     public class InfographicFeedbackViewModel
     {
         public List<InfographicFeedback> FeedbackList { get; set; } = new List<InfographicFeedback>();
-
+        public List<InfographicModel> infographics { get; set; } = new List<InfographicModel>();
         public int TotalCount
         {
             get

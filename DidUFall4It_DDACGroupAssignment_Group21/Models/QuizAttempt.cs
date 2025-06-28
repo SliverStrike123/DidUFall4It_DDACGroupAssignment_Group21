@@ -8,5 +8,7 @@
         public string SelectedAnswer { get; set; }
         public string Notes { get; set; }
         public DateTime AttemptDate { get; set; }
+        public int InformativeRating { get; set; } 
+        public int EngagementRating { get; set; } 
     }
 }

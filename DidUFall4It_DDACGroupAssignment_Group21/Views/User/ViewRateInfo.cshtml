@@ -1,7 +1,64 @@
-﻿
+﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.InfographicFeedback
+
 @{
-    ViewData["Title"] = "ViewRateInfo";
+    ViewData["Title"] = "Rate Infographic";
 }
 
-<h1>ViewRateInfo</h1>
+<h2>Rate Infographic</h2>
 
+<form asp-action="Rate" method="post">
+    <input type="hidden" asp-for="InfographicId" />
+
+    @* === Informative Rating === *@
+    <div class="mb-3">
+        <label class="form-label d-block">Informative</label>
+        @for (int i = 1; i <= 5; i++)
+        {
+            <label class="btn btn-outline-primary me-1">
+                <input type="radio" name="InformativeRating" value="@i" autocomplete="off" required /> @i
+            </label>
+        }
+    </div>
+
+    @* === Engagement Rating === *@
+    <div class="mb-3">
+        <label class="form-label d-block">Engagement</label>
+        @for (int i = 1; i <= 5; i++)
+        {
+            <label class="btn btn-outline-success me-1">
+                <input type="radio" name="EngagementRating" value="@i" autocomplete="off" required /> @i
+            </label>
+        }
+    </div>
+
+    @* === Clarity Rating === *@
+    <div class="mb-3">
+        <label class="form-label d-block">Clarity</label>
+        @for (int i = 1; i <= 5; i++)
+        {
+            <label class="btn btn-outline-warning me-1">
+                <input type="radio" name="ClarityRating" value="@i" autocomplete="off" required /> @i
+            </label>
+        }
+    </div>
+
+    @* === Relevance Rating === *@
+    <div class="mb-3">
+        <label class="form-label d-block">Relevance</label>
+        @for (int i = 1; i <= 5; i++)
+        {
+            <label class="btn btn-outline-danger me-1">
+                <input type="radio" name="RelevanceRating" value="@i" autocomplete="off" required /> @i
+            </label>
+        }
+    </div>
+
+    @* === Optional Comment === *@
+    <div class="mb-3">
+        <label asp-for="Comment" class="form-label">Comment (optional)</label>
+        <textarea asp-for="Comment" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">Submit Rating</button>
+    <a asp-action="InfoViewAll" class="btn btn-secondary ms-2">Cancel</a>
+</form>

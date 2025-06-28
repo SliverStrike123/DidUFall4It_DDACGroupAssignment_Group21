@@ -4,6 +4,7 @@ using DidUFall4It_DDACGroupAssignment_Group21.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DidUFall4It_DDACGroupAssignment_Group21.Migrations
 {
     [DbContext(typeof(DidUFall4It_DDACGroupAssignment_Group21Context))]
-    partial class DidUFall4It_DDACGroupAssignment_Group21ContextModelSnapshot : ModelSnapshot
+    [Migration("20250628094017_updated-InfographicTable")]
+    partial class updatedInfographicTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

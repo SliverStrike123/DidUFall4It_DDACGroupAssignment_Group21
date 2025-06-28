@@ -1,0 +1,59 @@
+﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.InfographicFeedback
+@{
+    ViewData["Title"] = "Edit Feedback";
+}
+
+<h2>Edit Feedback</h2>
+
+<form asp-action="EditFeedback" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="InfographicId" />
+
+    <div class="mb-3">
+        <label>Informative (1–5)</label>
+        @for (int i = 1; i <= 5; i++)
+        {
+            <label class="btn btn-outline-primary me-1">
+                <input type="radio" name="InformativeRating" value="@i" @(Model.InformativeRating == i ? "checked" : "") /> @i
+            </label>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label>Engagement (1–5)</label>
+        @for (int i = 1; i <= 5; i++)
+        {
+            <label class="btn btn-outline-success me-1">
+                <input type="radio" name="EngagementRating" value="@i" @(Model.EngagementRating == i ? "checked" : "") /> @i
+            </label>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label>Clarity (1–5)</label>
+        @for (int i = 1; i <= 5; i++)
+        {
+            <label class="btn btn-outline-warning me-1">
+                <input type="radio" name="ClarityRating" value="@i" @(Model.ClarityRating == i ? "checked" : "") /> @i
+            </label>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label>Relevance (1–5)</label>
+        @for (int i = 1; i <= 5; i++)
+        {
+            <label class="btn btn-outline-danger me-1">
+                <input type="radio" name="RelevanceRating" value="@i" @(Model.RelevanceRating == i ? "checked" : "") /> @i
+            </label>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Comment" class="form-label">Comment</label>
+        <textarea asp-for="Comment" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save Changes</button>
+    <a asp-action="InfoMyFeedback" class="btn btn-secondary ms-2">Cancel</a>
+</form>

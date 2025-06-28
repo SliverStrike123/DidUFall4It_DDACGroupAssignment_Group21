@@ -27,15 +27,16 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             return View();
         }
 
-        public IActionResult QuizAccess()
+        public IActionResult QuizViewUser()
         {
-            return RedirectToAction("Index", "Quiz");
+            var quizzes = _context.Quizzes
+                .OrderBy(q => q.Title)
+                .ToList();
+            QuizViewModel quizViewModel = new QuizViewModel();
+            quizViewModel.Quizzes = quizzes;
+            return View(quizViewModel);
         }
 
-        public IActionResult InfographicAccess()
-        {
-            return RedirectToAction("ViewAll", "InfographicControllerUser");
-        }
 
         public IActionResult ProgressAccess()
         {
@@ -47,14 +48,19 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var infographics = await _context.Infographics
-                .Include(i => i.InfographicFeedbacks)
+                .OrderBy(i => i.Title)
+                .ToListAsync();
+
+            var feedbacks = await _context.InfographicFeedback
+                .Where(f => f.UserId == userId)
                 .ToListAsync();
 
             // Mark HasRated for each infographic
             foreach (var info in infographics)
             {
-                info.InfographicFeedbacks = info.InfographicFeedbacks ?? new List<InfographicFeedback>();
-                info.HasRated = info.InfographicFeedbacks.Any(f => f.UserId == userId); // You’ll add this prop below
+                var matchingFeedback = feedbacks.FirstOrDefault(f => f.InfographicId == info.Id);
+                info.HasRated = matchingFeedback != null;
+
             }
 
             var viewModel = new InfographicViewModel(infographics);
@@ -96,42 +102,111 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 
             return hasFeedback;
         }
-        public IActionResult Create() => View();
-
-        //[HttpPost]
-        //public IActionResult CreateFeedback(string infographicTitle, string comment)
-        //{
-        //    feedbackDb.Add(new InfographicFeedback
-        //    {
-        //        Id = feedbackDb.Count + 1,
-        //        UserId = "demo-user",
-        //        InfographicTitle = infographicTitle,
-        //        Comment = comment,
-        //        PostedAt = DateTime.Now
-        //    });
-        //    return RedirectToAction("ViewAll");
-        //}
-
-        public IActionResult MyComments()
+        [HttpPost]
+        public async Task<IActionResult> Rate(InfographicFeedback model)
         {
-            var userFeedback = feedbackDb.Where(x => x.UserId == "demo-user").ToList();
-            return View(userFeedback);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            // Prevent duplicate feedback from the same user
+            bool alreadyRated = await _context.InfographicFeedback
+                .AnyAsync(f => f.UserId == userId && f.InfographicId == model.InfographicId);
+
+            if (alreadyRated)
+            {
+                TempData["Message"] = "You have already rated this infographic.";
+                return RedirectToAction("InfoViewAll");
+            }
+            var infographic = await _context.Infographics
+                .FirstOrDefaultAsync(i => i.Id == model.InfographicId);
+
+            if (infographic == null)
+            {
+                TempData["Message"] = "Invalid infographic.";
+                return RedirectToAction("InfoViewAll");
+            }
+
+
+            model.UserId = userId;
+            model.PostedAt = DateTime.Now;
+            model.InfographicTitle = infographic.Title;
+
+            _context.InfographicFeedback.Add(model);
+            await _context.SaveChangesAsync();
+
+            TempData["Message"] = "Thank you for your feedback!";
+            return RedirectToAction("InfoViewAll");
+        }
+        // View all feedbacks by logged-in user
+        public async Task<IActionResult> InfoMyFeedback()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var feedbacks = await _context.InfographicFeedback
+                .Where(f => f.UserId == userId)
+                .OrderByDescending(f => f.PostedAt)
+                .ToListAsync();
+
+            return View(feedbacks);
         }
 
-        [HttpPost]
-        public IActionResult Update(int id, string comment)
+        // GET: Edit feedback
+        [HttpGet]
+        public async Task<IActionResult> InfoEditFeedbackView(int id)
         {
-            var item = feedbackDb.FirstOrDefault(x => x.Id == id);
-            if (item != null && item.UserId == "demo-user") item.Comment = comment;
-            return RedirectToAction("MyComments");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var feedback = await _context.InfographicFeedback
+                .FirstOrDefaultAsync(f => f.Id == id && f.UserId == userId);
+
+            if (feedback == null)
+                return NotFound();
+
+            return View(feedback);
         }
 
+        // POST: Save feedback
         [HttpPost]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> EditFeedback(InfographicFeedback updated)
         {
-            var item = feedbackDb.FirstOrDefault(x => x.Id == id);
-            if (item != null && item.UserId == "demo-user") feedbackDb.Remove(item);
-            return RedirectToAction("MyComments");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var feedback = await _context.InfographicFeedback
+                .FirstOrDefaultAsync(f => f.Id == updated.Id && f.UserId == userId);
+
+            if (feedback == null)
+                return NotFound();
+
+            // Update fields
+            feedback.InformativeRating = updated.InformativeRating;
+            feedback.EngagementRating = updated.EngagementRating;
+            feedback.ClarityRating = updated.ClarityRating;
+            feedback.RelevanceRating = updated.RelevanceRating;
+            feedback.Comment = updated.Comment;
+            feedback.PostedAt = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("InfoMyFeedback");
+        }
+
+        // DELETE
+        [HttpPost]
+        public async Task<IActionResult> DeleteFeedback(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var feedback = await _context.InfographicFeedback
+                .FirstOrDefaultAsync(f => f.Id == id && f.UserId == userId);
+
+            if (feedback != null)
+            {
+                _context.InfographicFeedback.Remove(feedback);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("InfoMyFeedback");
         }
 
         public static List<LearningGoal> goalDb = new();
