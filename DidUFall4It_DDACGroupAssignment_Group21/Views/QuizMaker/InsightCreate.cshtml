@@ -1,14 +1,44 @@
-﻿@{
-    ViewData["Title"] = "Insight Create";
+﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.QuizReview
+
+@{
+    ViewData["Title"] = "Create Insight";
 }
 
-<h1>InfoHome</h1>
+<h1>Create Insight</h1>
 
-<div class="container mt-5">
-    <div class="text-center">
-        <h2 class="mb-4">Quiz List</h2>
-        <div class="d-grid gap-3 col-6 mx-auto">
-            <a asp-controller="QuizMaker" asp-action="InsightHome" class="btn btn-outline-secondary btn-lg">Back</a>
-        </div>
+<form asp-controller="QuizMaker" asp-action="InsightCreate" method="post">
+    <div class="mb-3">
+        <label class="form-label">Quiz ID</label>
+        <input asp-for="QuizId" class="form-control" />
     </div>
-</div>
+    <div class="mb-3">
+        <label class="form-label">Tag</label>
+        <input asp-for="Tag" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Average Score</label>
+        <input asp-for="AverageScore" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Highest Score</label>
+        <input asp-for="HighestScore" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Lowest Score</label>
+        <input asp-for="LowestScore" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Informative Ratings (comma-separated)</label>
+        <input name="InformativeRatingsInput" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Engagement Ratings (comma-separated)</label>
+        <input name="EngagementRatingsInput" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Comments (one per line)</label>
+        <textarea name="CommentsInput" class="form-control"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Create Insight</button>
+    <a asp-controller="QuizMaker" asp-action="InsightHome" class="btn btn-secondary">Back</a>
+</form>

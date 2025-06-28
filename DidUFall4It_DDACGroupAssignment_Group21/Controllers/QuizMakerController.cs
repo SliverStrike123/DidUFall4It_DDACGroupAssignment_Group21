@@ -249,5 +249,31 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             // Redirect to the QuestionEdit page (or wherever you want)
             return RedirectToAction("QuestionEdit");
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult InsightCreate(QuizReview model, string InformativeRatingsInput, string EngagementRatingsInput, string CommentsInput)
+        {
+            // Parse and assign the ratings/comments from the form inputs
+            model.InformativeRatings = InformativeRatingsInput?
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => int.Parse(s.Trim()))
+                .ToList() ?? new List<int>();
+
+            model.EngagementRatings = EngagementRatingsInput?
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => int.Parse(s.Trim()))
+                .ToList() ?? new List<int>();
+
+            model.Comments = CommentsInput?
+                .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => s.Trim())
+                .ToList() ?? new List<string>();
+
+            _context.QuizReviews.Add(model);
+            _context.SaveChanges();
+
+            return RedirectToAction("InsightHome");
+        }
     }
 }
