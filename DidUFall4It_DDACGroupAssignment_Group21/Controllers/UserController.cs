@@ -86,7 +86,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             await _context.SaveChangesAsync();
 
             // Redirect to the rating form
-            return RedirectToAction("RateQuiz", new { attemptId = attempt.Id });
+            return RedirectToAction("RateQuizView", new { attemptId = attempt.Id });
         }
         public IActionResult ProgressAccess()
         {

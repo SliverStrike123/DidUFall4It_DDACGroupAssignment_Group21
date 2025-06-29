@@ -6,7 +6,7 @@
         public string UserId { get; set; }
         public int QuizID { get; set; }
         public int Score { get; set; }
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         public DateTime AttemptDate { get; set; }
         public int InformativeRating { get; set; } 
         public int EngagementRating { get; set; } 
