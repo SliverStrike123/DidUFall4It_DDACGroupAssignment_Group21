@@ -1,0 +1,34 @@
+﻿@model List<DidUFall4It_DDACGroupAssignment_Group21.Models.QuizHistoryViewModel>
+
+@{
+    ViewData["Title"] = "Quiz History";
+}
+
+<h2>Quiz History</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">You haven't attempted any quizzes yet.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Quiz Title</th>
+                <th>Score</th>
+                <th>Attempt Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.QuizTitle</td>
+                    <td>@item.Score</td>
+                    <td>@item.AttemptDate.ToString("g")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

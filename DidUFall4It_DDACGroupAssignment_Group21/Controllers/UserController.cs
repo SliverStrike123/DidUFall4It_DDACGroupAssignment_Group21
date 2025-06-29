@@ -303,6 +303,26 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             return View(quiz);
         }
 
+        public async Task<IActionResult> QuizHistory()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var history = await _context.QuizAttempts
+                .Where(a => a.UserId == userId)
+                .Include(a => a.QuizID) // Load Quiz navigation property
+                .OrderByDescending(a => a.AttemptDate)
+                .Select(a => new QuizHistoryViewModel
+                {
+                    QuizTitle = a.Quiz != null ? a.Quiz.Title : "(Unknown Quiz)",
+                    Score = a.Score,
+                    AttemptDate = a.AttemptDate
+                })
+                .ToListAsync();
+
+            return View(history);
+        }
+
+
         public IActionResult CreateLearningGoalView() => View();
 
         [HttpPost]
