@@ -1,5 +1,6 @@
 ﻿using DidUFall4It_DDACGroupAssignment_Group21.Data;
 using DidUFall4It_DDACGroupAssignment_Group21.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -29,20 +30,91 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 
         public IActionResult QuizViewUser()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var quizzes = _context.Quizzes
                 .OrderBy(q => q.Title)
                 .ToList();
-            QuizViewModel quizViewModel = new QuizViewModel();
-            quizViewModel.Quizzes = quizzes;
+
+            var attemptedQuizIds = _context.QuizAttempts
+                .Where(a => a.UserId == userId)
+                .Select(a => a.QuizID)
+                .ToHashSet();
+
+            foreach (var quiz in quizzes)
+            {
+                quiz.hasAttempted = attemptedQuizIds.Contains(quiz.QuizModelId);
+            }
+
+            var quizViewModel = new QuizViewModel
+            {
+                Quizzes = quizzes
+            };
+
             return View(quizViewModel);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitQuiz(QuizSubmissionViewModel submission)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            var questions = _context.Questions
+                .Where(q => q.QuizModelId == submission.QuizID)
+                .ToList();
+
+            int score = 0;
+            foreach (var question in questions)
+            {
+                if (submission.SubmittedAnswers.TryGetValue(question.QuestionId, out int answer) &&
+                    question.Answer == answer)
+                {
+                    score += question.Score ?? 0;
+                }
+            }
+
+            var attempt = new QuizAttempt
+            {
+                UserId = userId,
+                QuizID = submission.QuizID,
+                Score = score,
+                AttemptDate = DateTime.Now
+            };
+
+            _context.QuizAttempts.Add(attempt);
+            await _context.SaveChangesAsync();
+
+            // Redirect to the rating form
+            return RedirectToAction("RateQuiz", new { attemptId = attempt.Id });
+        }
         public IActionResult ProgressAccess()
         {
             return RedirectToAction("List", "Progress");
         }
+        [HttpGet]
+        public IActionResult RateQuizView(int attemptId)
+        {
+            var model = new QuizAttempt { Id = attemptId };
+            return View(model); // Will only collect Rating + Notes in the form
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RateQuiz(QuizAttempt model)
+        {
+            var attempt = await _context.QuizAttempts.FindAsync(model.Id);
+            if (attempt == null) return NotFound();
+
+            attempt.Notes = model.Notes;
+            attempt.InformativeRating = model.InformativeRating;
+            attempt.EngagementRating = model.EngagementRating;
+
+            _context.QuizAttempts.Update(attempt);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("QuizViewUser");
+        }
         public async Task<IActionResult> InfoViewAll()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -215,6 +287,20 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         {
             var userGoals = goalDb.Where(x => x.UserId == "demo-user").ToList();
             return View(userGoals);
+        }
+
+        public IActionResult QuestionViewUser(int quizModelId)
+        {
+            var quiz = _context.Quizzes
+                .Include(q => q.QuestionIds) // Include related questions
+                .FirstOrDefault(q => q.QuizModelId == quizModelId);
+
+            if (quiz == null)
+            {
+                return NotFound();
+            }
+
+            return View(quiz);
         }
 
         public IActionResult CreateLearningGoalView() => View();

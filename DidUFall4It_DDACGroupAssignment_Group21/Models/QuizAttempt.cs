@@ -4,8 +4,8 @@
     {
         public int Id { get; set; }
         public string UserId { get; set; }
-        public string Question { get; set; }
-        public string SelectedAnswer { get; set; }
+        public int QuizID { get; set; }
+        public int Score { get; set; }
         public string Notes { get; set; }
         public DateTime AttemptDate { get; set; }
         public int InformativeRating { get; set; } 

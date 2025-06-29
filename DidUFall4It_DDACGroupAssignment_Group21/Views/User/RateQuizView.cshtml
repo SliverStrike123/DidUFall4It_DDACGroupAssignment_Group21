@@ -1,0 +1,32 @@
+﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.QuizAttempt
+
+@{
+    ViewData["Title"] = "Rate Your Quiz Attempt";
+}
+
+<h2>Rate Your Quiz Attempt</h2>
+
+<div class="alert alert-success">
+    <strong>Your Score:</strong> @Model.Score
+</div>
+
+<form asp-action="RateQuiz" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="InformativeRating">How informative was it? (1-5)</label>
+        <input asp-for="InformativeRating" type="number" min="1" max="5" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="EngagementRating">How engaging was it? (1-5)</label>
+        <input asp-for="EngagementRating" type="number" min="1" max="5" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Notes">Any notes?</label>
+        <textarea asp-for="Notes" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+</form>
