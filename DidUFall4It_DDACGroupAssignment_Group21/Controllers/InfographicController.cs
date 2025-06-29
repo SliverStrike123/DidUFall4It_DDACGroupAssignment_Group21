@@ -57,6 +57,16 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             return View("InfographicFeedbacks");
         }
 
+        [HttpPost]
+        public IActionResult DeleteInsights()
+        {
+            ViewBag.MetricAverage = null;
+            ViewBag.SelectedMetric = null;
+            ViewBag.RecentComments = null;
+
+            return View("InfographicFeedbacks"); 
+        }
+
         public IActionResult InfoCreate()
         {
             return View();
