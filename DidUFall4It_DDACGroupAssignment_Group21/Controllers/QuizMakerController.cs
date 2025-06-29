@@ -87,9 +87,12 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         {
             return View();
         }
-        public IActionResult InsightEdit()
+        public IActionResult InsightEdit(int id)
         {
-            return View();
+            var insight = _context.QuizReviews.FirstOrDefault(r => r.QuizReviewId == id);
+            if (insight == null)
+                return NotFound();
+            return View(insight);
         }
 
         //for QuizReview db seeding, don't worry about it
@@ -322,6 +325,35 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             _context.SaveChanges();
 
             return RedirectToAction("InsightHome");
+        }
+
+        // POST: Update the insight
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult InsightEdit(QuizReview model)
+        {
+            var insight = _context.QuizReviews.FirstOrDefault(r => r.QuizReviewId == model.QuizReviewId);
+            if (insight == null)
+                return NotFound();
+
+            // Only update the Tag
+            insight.Tag = model.Tag;
+
+            _context.SaveChanges();
+            return RedirectToAction("InsightList");
+        }
+        // POST: Delete the insight
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteInsight(int QuizReviewId)
+        {
+            var insight = _context.QuizReviews.FirstOrDefault(r => r.QuizReviewId == QuizReviewId);
+            if (insight == null)
+                return NotFound();
+
+            _context.QuizReviews.Remove(insight);
+            _context.SaveChanges();
+            return RedirectToAction("InsightList");
         }
     }
 }

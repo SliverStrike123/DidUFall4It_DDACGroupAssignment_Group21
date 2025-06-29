@@ -20,6 +20,7 @@
                     <th>Informative Ratings</th>
                     <th>Engagement Ratings</th>
                     <th>Comments</th>
+                    <th>Edit</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,6 +44,14 @@
                                     }
                                 </ul>
                             }
+                        </td>
+                        <td>
+                            <a asp-controller="QuizMaker"
+                               asp-action="InsightEdit"
+                               asp-route-id="@insight.QuizReviewId"
+                               class="btn btn-sm btn-primary">
+                                Edit
+                            </a>
                         </td>
                     </tr>
                 }
