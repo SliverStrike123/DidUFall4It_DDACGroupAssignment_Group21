@@ -307,17 +307,18 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var history = await _context.QuizAttempts
-                .Where(a => a.UserId == userId)
-                .Include(a => a.QuizID) // Load Quiz navigation property
-                .OrderByDescending(a => a.AttemptDate)
-                .Select(a => new QuizHistoryViewModel
+            var history = await (
+                from attempt in _context.QuizAttempts
+                join quiz in _context.Quizzes on attempt.QuizID equals quiz.QuizModelId
+                where attempt.UserId == userId
+                orderby attempt.AttemptDate descending
+                select new QuizHistoryViewModel
                 {
-                    QuizTitle = a.Quiz != null ? a.Quiz.Title : "(Unknown Quiz)",
-                    Score = a.Score,
-                    AttemptDate = a.AttemptDate
-                })
-                .ToListAsync();
+                    QuizTitle = quiz.Title,
+                    Score = attempt.Score,
+                    AttemptDate = attempt.AttemptDate
+                }
+            ).ToListAsync();
 
             return View(history);
         }
