@@ -76,7 +76,8 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         }
         public IActionResult InsightList()
         {
-            return View();
+            var insights = _context.QuizReviews.ToList();
+            return View(insights);
         }
         public IActionResult InsightHome()
         {
@@ -90,6 +91,53 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         {
             return View();
         }
+
+        //for QuizReview db seeding, don't worry about it
+        //public IActionResult SeedQuizReviews()
+        //{
+        //    if (!_context.QuizReviews.Any())
+        //    {
+        //        _context.QuizReviews.Add(new QuizReview
+        //        {
+        //            QuizId = 1,
+        //            Tag = "Test Insight",
+        //            AverageScore = 80,
+        //            HighestScore = 95,
+        //            LowestScore = 60,
+        //            InformativeRatings = new List<int> { 5, 4, 4 },
+        //            EngagementRatings = new List<int> { 4, 3, 5 },
+        //            Comments = new List<string> { "Well structured.", "Enjoyed the quiz." }
+        //        });
+
+        //        _context.QuizReviews.Add(new QuizReview
+        //        {
+        //            QuizId = 2,
+        //            Tag = "Test Insight 2",
+        //            AverageScore = 50,
+        //            HighestScore = 70,
+        //            LowestScore = 35,
+        //            InformativeRatings = new List<int> { 5, 4, 4 },
+        //            EngagementRatings = new List<int> { 4, 3, 5 },
+        //            Comments = new List<string> { "Quiz was hard.", "I am crashing out" }
+        //        });
+
+        //        // Add another row of dummy data
+        //        _context.QuizReviews.Add(new QuizReview
+        //        {
+        //            QuizId = 3,
+        //            Tag = "Sample Insight 3",
+        //            AverageScore = 88,
+        //            HighestScore = 100,
+        //            LowestScore = 70,
+        //            InformativeRatings = new List<int> { 5, 5, 4 },
+        //            EngagementRatings = new List<int> { 5, 4, 5 },
+        //            Comments = new List<string> { "Excellent quiz!", "Very engaging." }
+        //        });
+
+        //        _context.SaveChanges();
+        //    }
+        //    return Content("Dummy QuizReview seeded.");
+        //}
 
 
         [HttpPost]

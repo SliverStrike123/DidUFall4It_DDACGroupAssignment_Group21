@@ -1,12 +1,53 @@
-﻿@{
+﻿@model IEnumerable<DidUFall4It_DDACGroupAssignment_Group21.Models.QuizReview>
+
+@{
     ViewData["Title"] = "Insight List";
 }
 
-<h1>InfoHome</h1>
+<h1>Quiz Insights</h1>
 
 <div class="container mt-5">
     <div class="text-center">
-        <h2 class="mb-4">Quiz List</h2>
+        <h2 class="mb-4">Insights</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Quiz ID</th>
+                    <th>Tag</th>
+                    <th>Average Score</th>
+                    <th>Highest Score</th>
+                    <th>Lowest Score</th>
+                    <th>Informative Ratings</th>
+                    <th>Engagement Ratings</th>
+                    <th>Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var insight in Model)
+                {
+                    <tr>
+                        <td>@insight.QuizId</td>
+                        <td>@insight.Tag</td>
+                        <td>@insight.AverageScore</td>
+                        <td>@insight.HighestScore</td>
+                        <td>@insight.LowestScore</td>
+                        <td>@string.Join(", ", insight.InformativeRatings ?? new List<int>())</td>
+                        <td>@string.Join(", ", insight.EngagementRatings ?? new List<int>())</td>
+                        <td>
+                            @if (insight.Comments != null)
+                            {
+                                <ul>
+                                    @foreach (var comment in insight.Comments)
+                                    {
+                                        <li>@comment</li>
+                                    }
+                                </ul>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
         <div class="d-grid gap-3 col-6 mx-auto">
             <a asp-controller="QuizMaker" asp-action="InsightHome" class="btn btn-outline-secondary btn-lg">Back</a>
         </div>
