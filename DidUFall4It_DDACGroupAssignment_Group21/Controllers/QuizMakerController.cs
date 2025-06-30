@@ -158,7 +158,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             _context.Quizzes.Add(model);
             _context.SaveChanges();
 
-            return RedirectToAction("QuizList");
+            return RedirectToAction("QuizCreate");
         }
 
         [HttpPost]
