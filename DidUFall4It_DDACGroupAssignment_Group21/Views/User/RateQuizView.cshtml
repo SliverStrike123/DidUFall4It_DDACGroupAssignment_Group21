@@ -7,7 +7,7 @@
 <h2>Rate Your Quiz Attempt</h2>
 
 <div class="alert alert-success">
-    <strong>Your Score:</strong> @Model.Score
+    <strong>Your Score:</strong> @Model.Score<strong>/</strong> @Model.TotalScore
 </div>
 
 <form asp-action="RateQuiz" method="post">

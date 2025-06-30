@@ -65,8 +65,10 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                 .ToList();
 
             int score = 0;
+            int totalscore = 0;
             foreach (var question in questions)
             {
+                totalscore += question.Score ?? 0; 
                 if (submission.SubmittedAnswers.TryGetValue(question.QuestionId, out int answer) &&
                     question.Answer == answer)
                 {
@@ -79,6 +81,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                 UserId = userId,
                 QuizID = submission.QuizID,
                 Score = score,
+                TotalScore = totalscore,
                 AttemptDate = DateTime.Now
             };
 
@@ -86,16 +89,16 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             await _context.SaveChangesAsync();
 
             // Redirect to the rating form
-            return RedirectToAction("RateQuizView", new { attemptId = attempt.Id, score = attempt.Score });
+            return RedirectToAction("RateQuizView", new { attemptId = attempt.Id, score = attempt.Score, totalScore = attempt.TotalScore });
         }
         public IActionResult ProgressAccess()
         {
             return RedirectToAction("List", "Progress");
         }
         [HttpGet]
-        public IActionResult RateQuizView(int attemptId, int score)
+        public IActionResult RateQuizView(int attemptId, int score, int totalScore)
         {
-            var model = new QuizAttempt { Id = attemptId, Score = score };
+            var model = new QuizAttempt { Id = attemptId, Score = score, TotalScore = totalScore };
             return View(model); // Will only collect Rating + Notes in the form
         }
 
