@@ -2,43 +2,69 @@
 
 @{
     ViewData["Title"] = "Create Insight";
+    var quizzes = ViewBag.Quizzes as List<DidUFall4It_DDACGroupAssignment_Group21.Models.QuizModel>;
+    var attempts = ViewBag.Attempts as List<DidUFall4It_DDACGroupAssignment_Group21.Models.QuizAttempt>;
+    var avg = ViewBag.Average as double?;
+    var high = ViewBag.Highest as int?;
+    var low = ViewBag.Lowest as int?;
+    var selectedQuizId = ViewBag.SelectedQuizId as int?;
 }
 
 <h1>Create Insight</h1>
 
-<form asp-controller="QuizMaker" asp-action="InsightCreate" method="post">
+<!-- Quiz selection form -->
+<form method="get">
     <div class="mb-3">
-        <label class="form-label">Quiz ID</label>
-        <input asp-for="QuizId" class="form-control" />
+        <label class="form-label">Select Quiz</label>
+        <select name="selectedQuizId" class="form-select" onchange="this.form.submit()">
+            <option value="">-- Select Quiz --</option>
+            @if (quizzes != null)
+            {
+                foreach (var quiz in quizzes)
+                {
+                    <option value="@quiz.QuizModelId" selected="@(selectedQuizId == quiz.QuizModelId ? "selected" : null)">
+                        @quiz.Title
+                    </option>
+                }
+            }
+        </select>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Tag</label>
-        <input asp-for="Tag" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Average Score</label>
-        <input asp-for="AverageScore" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Highest Score</label>
-        <input asp-for="HighestScore" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Lowest Score</label>
-        <input asp-for="LowestScore" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Informative Ratings (comma-separated)</label>
-        <input name="InformativeRatingsInput" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Engagement Ratings (comma-separated)</label>
-        <input name="EngagementRatingsInput" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Comments (one per line)</label>
-        <textarea name="CommentsInput" class="form-control"></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Create Insight</button>
-    <a asp-controller="QuizMaker" asp-action="InsightHome" class="btn btn-secondary">Back</a>
 </form>
+
+@if (selectedQuizId != null && attempts != null && attempts.Any())
+{
+    <div class="mb-3">
+        <strong>Average Score:</strong> @avg <br />
+        <strong>Highest Score:</strong> @high <br />
+        <strong>Lowest Score:</strong> @low <br />
+    </div>
+    <div class="mb-3">
+        <strong>All Attempts:</strong>
+        <ul>
+            @foreach (var attempt in attempts)
+            {
+                <li>
+                    User: @attempt.UserId, Score: @attempt.Score, Date: @attempt.AttemptDate.ToShortDateString()
+                </li>
+            }
+        </ul>
+    </div>
+
+    <!-- Tag input and submit form -->
+    <form asp-controller="QuizMaker" asp-action="InsightCreate" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="QuizId" value="@selectedQuizId" />
+        <input type="hidden" name="AverageScore" value="@avg" />
+        <input type="hidden" name="HighestScore" value="@high" />
+        <input type="hidden" name="LowestScore" value="@low" />
+        <div class="mb-3">
+            <label class="form-label">Tag</label>
+            <input name="Tag" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Save Insight</button>
+    </form>
+}
+
+<div class="mt-4">
+    <a asp-controller="QuizMaker" asp-action="InsightHome" class="btn btn-secondary">Back to Insight Home</a>
+</div>

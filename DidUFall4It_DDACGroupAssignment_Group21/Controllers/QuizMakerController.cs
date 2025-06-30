@@ -83,8 +83,56 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         {
             return View();
         }
-        public IActionResult InsightCreate()
+        public IActionResult InsightCreate(int? selectedQuizId)
         {
+            ViewBag.Quizzes = _context.Quizzes.ToList();
+
+            List<QuizAttempt> attempts = new();
+            double? avg = null;
+            int? high = null;
+            int? low = null;
+            List<int> informativeRatings = new();
+            List<int> engagementRatings = new();
+            List<string> notes = new();
+
+            if (selectedQuizId.HasValue)
+            {
+                attempts = _context.QuizAttempts
+                    .Where(a => a.QuizID == selectedQuizId.Value)
+                    .ToList();
+
+                if (attempts.Any())
+                {
+                    avg = attempts.Average(a => a.Score);
+                    high = attempts.Max(a => a.Score);
+                    low = attempts.Min(a => a.Score);
+
+                    informativeRatings = attempts
+                        .Where(a => a.InformativeRating != 0) // Fix: Removed HasValue check
+                        .Select(a => a.InformativeRating)
+                        .ToList();
+
+                    engagementRatings = attempts
+                        .Where(a => a.EngagementRating != 0) // Fix: Removed HasValue check
+                        .Select(a => a.EngagementRating)
+                        .ToList();
+
+                    notes = attempts
+                        .Where(a => !string.IsNullOrWhiteSpace(a.Notes))
+                        .Select(a => a.Notes)
+                        .ToList();
+                }
+            }
+
+            ViewBag.Attempts = attempts;
+            ViewBag.Average = avg;
+            ViewBag.Highest = high;
+            ViewBag.Lowest = low;
+            ViewBag.SelectedQuizId = selectedQuizId;
+            ViewBag.InformativeRatings = informativeRatings;
+            ViewBag.EngagementRatings = engagementRatings;
+            ViewBag.Notes = notes;
+
             return View();
         }
         public IActionResult InsightEdit(int id)
@@ -303,29 +351,51 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult InsightCreate(QuizReview model, string InformativeRatingsInput, string EngagementRatingsInput, string CommentsInput)
+        public IActionResult InsightCreate(
+            int QuizId,
+            string Tag,
+            double? AverageScore,
+            int? HighestScore,
+            int? LowestScore)
         {
-            // Parse and assign the ratings/comments from the form inputs
-            model.InformativeRatings = InformativeRatingsInput?
-                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => int.Parse(s.Trim()))
-                .ToList() ?? new List<int>();
+            // Always extract ratings/comments from QuizAttempts for this quiz
+            var attempts = _context.QuizAttempts
+                .Where(a => a.QuizID == QuizId)
+                .ToList();
 
-            model.EngagementRatings = EngagementRatingsInput?
-                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => int.Parse(s.Trim()))
-                .ToList() ?? new List<int>();
+            var informativeRatings = attempts
+                .Where(a => a.InformativeRating != 0)
+                .Select(a => a.InformativeRating)
+                .ToList();
 
-            model.Comments = CommentsInput?
-                .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => s.Trim())
-                .ToList() ?? new List<string>();
+            var engagementRatings = attempts
+                .Where(a => a.EngagementRating != 0)
+                .Select(a => a.EngagementRating)
+                .ToList();
 
-            _context.QuizReviews.Add(model);
+            var notes = attempts
+                .Where(a => !string.IsNullOrWhiteSpace(a.Notes))
+                .Select(a => a.Notes)
+                .ToList();
+
+            var insight = new QuizReview
+            {
+                QuizId = QuizId,
+                Tag = Tag,
+                AverageScore = AverageScore,
+                HighestScore = HighestScore,
+                LowestScore = LowestScore,
+                InformativeRatings = informativeRatings,
+                EngagementRatings = engagementRatings,
+                Comments = notes
+            };
+
+            _context.QuizReviews.Add(insight);
             _context.SaveChanges();
 
-            return RedirectToAction("InsightHome");
+            return RedirectToAction("InsightList");
         }
+
 
         // POST: Update the insight
         [HttpPost]
