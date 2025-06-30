@@ -86,16 +86,16 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             await _context.SaveChangesAsync();
 
             // Redirect to the rating form
-            return RedirectToAction("RateQuizView", new { attemptId = attempt.Id });
+            return RedirectToAction("RateQuizView", new { attemptId = attempt.Id, score = attempt.Score });
         }
         public IActionResult ProgressAccess()
         {
             return RedirectToAction("List", "Progress");
         }
         [HttpGet]
-        public IActionResult RateQuizView(int attemptId)
+        public IActionResult RateQuizView(int attemptId, int score)
         {
-            var model = new QuizAttempt { Id = attemptId };
+            var model = new QuizAttempt { Id = attemptId, Score = score };
             return View(model); // Will only collect Rating + Notes in the form
         }
 
