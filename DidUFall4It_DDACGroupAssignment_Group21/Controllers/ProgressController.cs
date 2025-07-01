@@ -1,62 +1,92 @@
-﻿using DidUFall4It_DDACGroupAssignment_Group21.Models;
+﻿using DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Data;
+using DidUFall4It_DDACGroupAssignment_Group21.Data;
+using DidUFall4It_DDACGroupAssignment_Group21.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 {
     public class ProgressController : Controller
     {
-        public static List<LearningGoal> goalDb = new();
+        private readonly DidUFall4It_DDACGroupAssignment_Group21Context _context;
+        private readonly UserManager<DidUFall4It_DDACGroupAssignment_Group21User> _userManager;
 
-        public IActionResult List()
+        public ProgressController(DidUFall4It_DDACGroupAssignment_Group21Context context, UserManager<DidUFall4It_DDACGroupAssignment_Group21User> userManager)
         {
-            var userGoals = goalDb.Where(x => x.UserId == "demo-user").ToList();
-            return View(userGoals);
+            _context = context;
+            _userManager = userManager;
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> List()
         {
-            return View();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var goals = await _context.LearningGoals
+                .Where(g => g.UserId == userId)
+                .OrderByDescending(g => g.CreatedAt)
+                .ToListAsync();
+            return View(goals);
         }
+
+        [HttpGet]
+        public IActionResult Create() => View();
 
         [HttpPost]
-        public IActionResult Create(string goal, DateTime endDate)
+        public async Task<IActionResult> Create(string goal, DateTime endDate)
         {
-            var startDate = DateTime.Today;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var startDate = DateTime.Now;
             var duration = (endDate - startDate).Days;
 
-            goalDb.Add(new LearningGoal
+            var newGoal = new LearningGoal
             {
-                Id = goalDb.Count + 1,
-                UserId = "demo-user",
                 Goal = goal,
-                IsCompleted = false,
+                UserId = userId,
                 CreatedAt = startDate,
                 EndDate = endDate,
-                DurationDays = duration
-            });
+                DurationDays = duration,
+                IsCompleted = false
+            };
 
-            ViewBag.Message = "Goal saved successfully!";
-            return View();
+            _context.LearningGoals.Add(newGoal);
+            await _context.SaveChangesAsync();
+
+            ViewBag.Message = "Learning goal added successfully.";
+            return View();  // Stay on the same page
         }
 
         [HttpPost]
-        public IActionResult MarkComplete(int id)
+        public async Task<IActionResult> MarkComplete(int id)
         {
-            var item = goalDb.FirstOrDefault(x => x.Id == id);
-            if (item != null && item.UserId == "demo-user")
-                item.IsCompleted = true;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var goal = await _context.LearningGoals
+                .FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId);
+
+            if (goal != null)
+            {
+                goal.IsCompleted = true;
+                await _context.SaveChangesAsync();
+            }
 
             return RedirectToAction("List");
         }
 
         [HttpPost]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var item = goalDb.FirstOrDefault(x => x.Id == id);
-            if (item != null && item.UserId == "demo-user")
-                goalDb.Remove(item);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var goal = await _context.LearningGoals
+                .FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId);
+
+            if (goal != null)
+            {
+                _context.LearningGoals.Remove(goal);
+                await _context.SaveChangesAsync();
+            }
 
             return RedirectToAction("List");
         }
     }
+
 }
