@@ -319,6 +319,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                 {
                     QuizTitle = quiz.Title,
                     Score = attempt.Score,
+                    TotalScore = attempt.TotalScore,
                     AttemptDate = attempt.AttemptDate
                 }
             ).ToListAsync();

@@ -1,59 +1,76 @@
 ﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.InfographicFeedback
 @{
     ViewData["Title"] = "Edit Feedback";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Edit Feedback</h2>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white fs-4 rounded-top-4">
+            <i class="bi bi-pencil-square"></i> Edit Feedback
+        </div>
+        <div class="card-body">
+            <form asp-action="EditFeedback" method="post">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="InfographicId" />
 
-<form asp-action="EditFeedback" method="post">
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" asp-for="InfographicId" />
+                @* Rating Fields *@
+                <div class="mb-3">
+                    <label class="form-label d-block">Informative (1–5)</label>
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <label class="btn btn-outline-primary me-1 @(Model.InformativeRating == i ? "active" : "")">
+                            <input type="radio" name="InformativeRating" value="@i" autocomplete="off" @(Model.InformativeRating == i ? "checked" : "") /> @i
+                        </label>
+                    }
+                </div>
 
-    <div class="mb-3">
-        <label>Informative (1–5)</label>
-        @for (int i = 1; i <= 5; i++)
-        {
-            <label class="btn btn-outline-primary me-1">
-                <input type="radio" name="InformativeRating" value="@i" @(Model.InformativeRating == i ? "checked" : "") /> @i
-            </label>
-        }
+                <div class="mb-3">
+                    <label class="form-label d-block">Engagement (1–5)</label>
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <label class="btn btn-outline-success me-1 @(Model.EngagementRating == i ? "active" : "")">
+                            <input type="radio" name="EngagementRating" value="@i" autocomplete="off" @(Model.EngagementRating == i ? "checked" : "") /> @i
+                        </label>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label d-block">Clarity (1–5)</label>
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <label class="btn btn-outline-warning me-1 @(Model.ClarityRating == i ? "active" : "")">
+                            <input type="radio" name="ClarityRating" value="@i" autocomplete="off" @(Model.ClarityRating == i ? "checked" : "") /> @i
+                        </label>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label d-block">Relevance (1–5)</label>
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <label class="btn btn-outline-danger me-1 @(Model.RelevanceRating == i ? "active" : "")">
+                            <input type="radio" name="RelevanceRating" value="@i" autocomplete="off" @(Model.RelevanceRating == i ? "checked" : "") /> @i
+                        </label>
+                    }
+                </div>
+
+                @* Comment *@
+                <div class="mb-4">
+                    <label asp-for="Comment" class="form-label">Comment</label>
+                    <textarea asp-for="Comment" class="form-control" rows="4"></textarea>
+                </div>
+
+                @* Buttons *@
+                <div class="d-flex justify-content-between">
+                    <a asp-action="InfoMyFeedback" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left-circle"></i> Back to My Feedbacks
+                    </a>
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="bi bi-save2"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label>Engagement (1–5)</label>
-        @for (int i = 1; i <= 5; i++)
-        {
-            <label class="btn btn-outline-success me-1">
-                <input type="radio" name="EngagementRating" value="@i" @(Model.EngagementRating == i ? "checked" : "") /> @i
-            </label>
-        }
-    </div>
-
-    <div class="mb-3">
-        <label>Clarity (1–5)</label>
-        @for (int i = 1; i <= 5; i++)
-        {
-            <label class="btn btn-outline-warning me-1">
-                <input type="radio" name="ClarityRating" value="@i" @(Model.ClarityRating == i ? "checked" : "") /> @i
-            </label>
-        }
-    </div>
-
-    <div class="mb-3">
-        <label>Relevance (1–5)</label>
-        @for (int i = 1; i <= 5; i++)
-        {
-            <label class="btn btn-outline-danger me-1">
-                <input type="radio" name="RelevanceRating" value="@i" @(Model.RelevanceRating == i ? "checked" : "") /> @i
-            </label>
-        }
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Comment" class="form-label">Comment</label>
-        <textarea asp-for="Comment" class="form-control"></textarea>
-    </div>
-
-    <button type="submit" class="btn btn-success">Save Changes</button>
-    <a asp-action="InfoMyFeedback" class="btn btn-secondary ms-2">Cancel</a>
-</form>
+</div>

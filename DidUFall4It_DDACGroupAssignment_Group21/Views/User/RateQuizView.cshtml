@@ -1,32 +1,47 @@
 ﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.QuizAttempt
-
 @{
     ViewData["Title"] = "Rate Your Quiz Attempt";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Rate Your Quiz Attempt</h2>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white fs-4 rounded-top-4">
+            <i class="bi bi-star-half"></i> Rate Your Quiz Attempt
+        </div>
+        <div class="card-body">
+            <div class="alert alert-success">
+                <strong>Your Score:</strong> @Model.Score / @Model.TotalScore
+            </div>
 
-<div class="alert alert-success">
-    <strong>Your Score:</strong> @Model.Score<strong>/</strong> @Model.TotalScore
+            <form asp-action="RateQuiz" method="post">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label asp-for="InformativeRating" class="form-label">How informative was it? (1-5)</label>
+                    <input asp-for="InformativeRating" type="number" min="1" max="5" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EngagementRating" class="form-label">How engaging was it? (1-5)</label>
+                    <input asp-for="EngagementRating" type="number" min="1" max="5" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Notes" class="form-label">Any notes?</label>
+                    <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary px-4">Submit Feedback</button>
+                </div>
+            </form>
+
+            <div class="mt-4">
+                <a asp-controller="User" asp-action="Index" class="btn btn-primary">
+                    <i class="bi bi-arrow-left-circle"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
-
-<form asp-action="RateQuiz" method="post">
-    <input type="hidden" asp-for="Id" />
-
-    <div class="mb-3">
-        <label asp-for="InformativeRating">How informative was it? (1-5)</label>
-        <input asp-for="InformativeRating" type="number" min="1" max="5" class="form-control" required />
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="EngagementRating">How engaging was it? (1-5)</label>
-        <input asp-for="EngagementRating" type="number" min="1" max="5" class="form-control" required />
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Notes">Any notes?</label>
-        <textarea asp-for="Notes" class="form-control"></textarea>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Submit Feedback</button>
-</form>

@@ -1,0 +1,61 @@
+﻿@model List<LearningGoal>
+@{
+    ViewData["Title"] = "My Learning Goals";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-success text-white fs-4 rounded-top-4">
+            <i class="bi bi-list-check"></i> My Learning Goals
+        </div>
+        <div class="card-body">
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-warning">You haven’t set any goals yet. Click “Set Learning Goal” to get started.</div>
+            }
+
+            @foreach (var item in Model)
+            {
+                <div class="card mb-4 shadow-sm border rounded-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold text-dark mb-2">
+                            <i class="bi bi-flag-fill text-success me-1"></i> @item.Goal
+                        </h5>
+
+                        <span class="badge bg-@(item.IsCompleted ? "success" : "warning") mb-3">
+                            @(item.IsCompleted ? "Completed" : "In Progress")
+                        </span>
+
+                        <div class="row text-dark fw-semibold mb-3">
+                            <div class="col-md-4"><i class="bi bi-calendar2-plus"></i> Start: @item.CreatedAt.ToString("d/M/yyyy")</div>
+                            <div class="col-md-4"><i class="bi bi-calendar2-check"></i> End: @item.EndDate.ToString("d/M/yyyy")</div>
+                            <div class="col-md-4"><i class="bi bi-hourglass-split"></i> Duration: @item.DurationDays day(s)</div>
+                        </div>
+
+                        <div class="mt-2">
+                            @if (!item.IsCompleted)
+                            {
+                                <form asp-action="MarkComplete" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button class="btn btn-outline-primary btn-sm px-3">Mark Complete</button>
+                                </form>
+                            }
+                            <form asp-action="Delete" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button class="btn btn-outline-danger btn-sm px-3">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="text-end mt-4">
+                <a asp-controller="User" asp-action="Index" class="btn btn-success">
+                    <i class="bi bi-arrow-left-circle"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

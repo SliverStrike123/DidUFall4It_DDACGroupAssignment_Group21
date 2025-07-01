@@ -1,41 +1,61 @@
 ﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.InfographicViewModel
-
 @{
     ViewData["Title"] = "All Infographics";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2 class="mb-4">All Infographics</h2>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-dark text-white fs-4 rounded-top-4">
+            <i class="bi bi-journal-richtext"></i> All Infographics
+        </div>
+        <div class="card-body bg-light">
 
-@if (Model.GetTotalCount() == 0)
-{
-    <p>No infographics available.</p>
-}
-else
-{
-    @foreach (var item in Model.GetList())
-    {
-        <div class="card mb-4 shadow-sm">
-            <div class="card-body">
-                <h4 class="card-title">@item.Title</h4>
-                <p class="card-text">@item.Description</p>
+            @if (Model.GetTotalCount() == 0)
+            {
+                <div class="alert alert-info">No infographics available.</div>
+            }
+            else
+            {
+                @foreach (var item in Model.GetList())
+                {
+                    <div class="card mb-4 shadow-sm border-0 rounded-3">
+                        <div class="card-body">
+                            <h5 class="fw-semibold text-primary">@item.Title</h5>
+                            <p class="mb-2">@item.Description</p>
 
-                <p class="text-muted">
-                    <small>Posted on @item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</small>
-                </p>
+                            <p class="text-muted small">
+                                <i class="bi bi-calendar2-week"></i> Posted on: @item.CreatedAt.ToString("yyyy-MM-dd HH:mm")
+                            </p>
 
-                <div class="d-flex gap-2">
-                    <a asp-controller="User" asp-action="ViewInfo" asp-route-id="@item.Id" class="btn btn-primary">View</a>
+                            <div class="d-flex gap-2">
+                                <a asp-controller="User" asp-action="ViewInfo" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
 
-                    @if (item.HasRated)
-                    {
-                        <button class="btn btn-secondary" disabled>Rated</button>
-                    }
-                    else
-                    {
-                        <a asp-controller="User" asp-action="ViewRateInfo" asp-route-id="@item.Id" class="btn btn-success">Rate</a>
-                    }
-                </div>
+                                @if (item.HasRated)
+                                {
+                                    <button class="btn btn-outline-secondary btn-sm" disabled>
+                                        <i class="bi bi-check-circle"></i> Rated
+                                    </button>
+                                }
+                                else
+                                {
+                                    <a asp-controller="User" asp-action="ViewRateInfo" asp-route-id="@item.Id" class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-star"></i> Rate
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+            <div class="text-end mt-4">
+                <a asp-controller="User" asp-action="Index" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
             </div>
         </div>
-    }
-}
+    </div>
+</div>

@@ -1,34 +1,45 @@
 ﻿@model List<DidUFall4It_DDACGroupAssignment_Group21.Models.QuizHistoryViewModel>
-
 @{
     ViewData["Title"] = "Quiz History";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Quiz History</h2>
-
-@if (!Model.Any())
-{
-    <div class="alert alert-info">You haven't attempted any quizzes yet.</div>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Quiz Title</th>
-                <th>Score</th>
-                <th>Attempt Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white fs-4 rounded-top-4">
+            <i class="bi bi-clock-history"></i> Quiz History
+        </div>
+        <div class="card-body">
+            @if (!Model.Any())
             {
-                <tr>
-                    <td>@item.QuizTitle</td>
-                    <td>@item.Score/@item.TotalScore</td>
-                    <td>@item.AttemptDate.ToString("g")</td>
-                </tr>
+                <div class="alert alert-warning">You haven't attempted any quizzes yet.</div>
             }
-        </tbody>
-    </table>
-}
+            else
+            {
+                <table class="table table-bordered table-hover mb-4">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Quiz Title</th>
+                            <th>Score</th>
+                            <th>Attempt Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.QuizTitle</td>
+                                <td>@item.Score / @item.TotalScore</td>
+                                <td>@item.AttemptDate.ToString("g")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+
+            <a asp-controller="User" asp-action="Index" class="btn btn-primary">
+                <i class="bi bi-arrow-left-circle"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>

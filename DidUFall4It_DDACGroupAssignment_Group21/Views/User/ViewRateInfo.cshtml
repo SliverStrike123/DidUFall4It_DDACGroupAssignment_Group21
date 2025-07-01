@@ -1,64 +1,54 @@
 ﻿@model DidUFall4It_DDACGroupAssignment_Group21.Models.InfographicFeedback
-
 @{
     ViewData["Title"] = "Rate Infographic";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Rate Infographic</h2>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-success text-white fs-4 rounded-top-4">
+            <i class="bi bi-star-half"></i> Rate Infographic
+        </div>
+        <div class="card-body">
+            <form asp-action="Rate" method="post">
+                <input type="hidden" asp-for="InfographicId" />
 
-<form asp-action="Rate" method="post">
-    <input type="hidden" asp-for="InfographicId" />
+                @foreach (var section in new[] { "Informative", "Engagement", "Clarity", "Relevance" })
+                {
+                    var color = section switch
+                    {
+                        "Informative" => "primary",
+                        "Engagement" => "success",
+                        "Clarity" => "warning",
+                        "Relevance" => "danger",
+                        _ => "secondary"
+                    };
+                    <div class="mb-3">
+                        <label class="form-label d-block">@(@section)</label>
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <label class="btn btn-outline-@color me-1">
+                                <input type="radio" name="@($"{section}Rating")" value="@i" autocomplete="off" required />
+                                @i
+                            </label>
+                        }
+                    </div>
+                }
 
-    @* === Informative Rating === *@
-    <div class="mb-3">
-        <label class="form-label d-block">Informative</label>
-        @for (int i = 1; i <= 5; i++)
-        {
-            <label class="btn btn-outline-primary me-1">
-                <input type="radio" name="InformativeRating" value="@i" autocomplete="off" required /> @i
-            </label>
-        }
+                <div class="mb-3">
+                    <label asp-for="Comment" class="form-label">Comment (optional)</label>
+                    <textarea asp-for="Comment" class="form-control"></textarea>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="InfoViewAll" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to All Infographics
+                    </a>
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="bi bi-check-circle"></i> Submit Rating
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    @* === Engagement Rating === *@
-    <div class="mb-3">
-        <label class="form-label d-block">Engagement</label>
-        @for (int i = 1; i <= 5; i++)
-        {
-            <label class="btn btn-outline-success me-1">
-                <input type="radio" name="EngagementRating" value="@i" autocomplete="off" required /> @i
-            </label>
-        }
-    </div>
-
-    @* === Clarity Rating === *@
-    <div class="mb-3">
-        <label class="form-label d-block">Clarity</label>
-        @for (int i = 1; i <= 5; i++)
-        {
-            <label class="btn btn-outline-warning me-1">
-                <input type="radio" name="ClarityRating" value="@i" autocomplete="off" required /> @i
-            </label>
-        }
-    </div>
-
-    @* === Relevance Rating === *@
-    <div class="mb-3">
-        <label class="form-label d-block">Relevance</label>
-        @for (int i = 1; i <= 5; i++)
-        {
-            <label class="btn btn-outline-danger me-1">
-                <input type="radio" name="RelevanceRating" value="@i" autocomplete="off" required /> @i
-            </label>
-        }
-    </div>
-
-    @* === Optional Comment === *@
-    <div class="mb-3">
-        <label asp-for="Comment" class="form-label">Comment (optional)</label>
-        <textarea asp-for="Comment" class="form-control"></textarea>
-    </div>
-
-    <button type="submit" class="btn btn-success">Submit Rating</button>
-    <a asp-action="InfoViewAll" class="btn btn-secondary ms-2">Cancel</a>
-</form>
+</div>

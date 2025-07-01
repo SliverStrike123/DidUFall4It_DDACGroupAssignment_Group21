@@ -13,27 +13,39 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             return View(userGoals);
         }
 
-        public IActionResult Create() => View();
+        public IActionResult Create()
+        {
+            return View();
+        }
 
         [HttpPost]
-        public IActionResult Create(string goal)
+        public IActionResult Create(string goal, DateTime endDate)
         {
+            var startDate = DateTime.Today;
+            var duration = (endDate - startDate).Days;
+
             goalDb.Add(new LearningGoal
             {
                 Id = goalDb.Count + 1,
                 UserId = "demo-user",
                 Goal = goal,
                 IsCompleted = false,
-                CreatedAt = DateTime.Now
+                CreatedAt = startDate,
+                EndDate = endDate,
+                DurationDays = duration
             });
-            return RedirectToAction("List");
+
+            ViewBag.Message = "Goal saved successfully!";
+            return View();
         }
 
         [HttpPost]
         public IActionResult MarkComplete(int id)
         {
             var item = goalDb.FirstOrDefault(x => x.Id == id);
-            if (item != null && item.UserId == "demo-user") item.IsCompleted = true;
+            if (item != null && item.UserId == "demo-user")
+                item.IsCompleted = true;
+
             return RedirectToAction("List");
         }
 
@@ -41,9 +53,10 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         public IActionResult Delete(int id)
         {
             var item = goalDb.FirstOrDefault(x => x.Id == id);
-            if (item != null && item.UserId == "demo-user") goalDb.Remove(item);
+            if (item != null && item.UserId == "demo-user")
+                goalDb.Remove(item);
+
             return RedirectToAction("List");
         }
     }
-
 }
