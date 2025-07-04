@@ -137,7 +137,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InfographicFeedback");
+                    b.ToTable("InfographicFeedback", (string)null);
                 });
 
             modelBuilder.Entity("DidUFall4It_DDACGroupAssignment_Group21.Models.InfographicModel", b =>
@@ -167,7 +167,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Infographics");
+                    b.ToTable("Infographics", (string)null);
                 });
 
             modelBuilder.Entity("DidUFall4It_DDACGroupAssignment_Group21.Models.LearningGoal", b =>
@@ -200,7 +200,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LearningGoals");
+                    b.ToTable("LearningGoals", (string)null);
                 });
 
             modelBuilder.Entity("DidUFall4It_DDACGroupAssignment_Group21.Models.Question", b =>
@@ -239,7 +239,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Migrations
 
                     b.HasIndex("QuizModelId");
 
-                    b.ToTable("Questions");
+                    b.ToTable("Questions", (string)null);
                 });
 
             modelBuilder.Entity("DidUFall4It_DDACGroupAssignment_Group21.Models.QuizAttempt", b =>
@@ -277,7 +277,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("QuizAttempts");
+                    b.ToTable("QuizAttempts", (string)null);
                 });
 
             modelBuilder.Entity("DidUFall4It_DDACGroupAssignment_Group21.Models.QuizModel", b =>
@@ -293,7 +293,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Migrations
 
                     b.HasKey("QuizModelId");
 
-                    b.ToTable("Quizzes");
+                    b.ToTable("Quizzes", (string)null);
                 });
 
             modelBuilder.Entity("DidUFall4It_DDACGroupAssignment_Group21.Models.QuizReview", b =>
@@ -335,7 +335,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Migrations
 
                     b.HasIndex("QuizModelId");
 
-                    b.ToTable("QuizReviews");
+                    b.ToTable("QuizReviews", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
