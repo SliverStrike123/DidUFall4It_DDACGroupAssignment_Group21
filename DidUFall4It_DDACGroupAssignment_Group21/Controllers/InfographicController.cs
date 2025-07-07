@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DidUFall4It_DDACGroupAssignment_Group21.Models;
+﻿using Amazon;
+using Amazon.S3;
+using Amazon.S3.Model;
 using DidUFall4It_DDACGroupAssignment_Group21.Data;
+using DidUFall4It_DDACGroupAssignment_Group21.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using static System.Net.Mime.MediaTypeNames;
 namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 {
     public class InfographicController : Controller
@@ -26,6 +30,20 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         public IActionResult InfographicFeedbacks()
         {
             return View();
+        }
+        private List<string> getValues()
+        {
+            List<string> values = new List<string>();
+            //1. link to appsettings.json and get back the values
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json");
+            IConfigurationRoot configure = builder.Build(); //build the json file
+                                                            //2. read the info from json using configure instance
+            values.Add(configure["Values:Key1"]);
+            values.Add(configure["Values:Key2"]);
+            values.Add(configure["Values:Key3"]);
+            return values;
         }
 
         [HttpPost]
@@ -99,17 +117,46 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             {
                 if (ImageFile != null)
                 {
-                    string uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
-                    Directory.CreateDirectory(uploadsFolder);
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
-                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    //1. add credential for action
+                    List<string> values = getValues();
+                    var awsS3client = new AmazonS3Client(values[0], values[1], values[2], RegionEndpoint.USEast1);
+                    if (ImageFile.Length <= 0)
                     {
-                        await ImageFile.CopyToAsync(fileStream);
+                        return BadRequest("It is an empty file. Unable to upload!");
+                    }
+                    else if (ImageFile.ContentType.ToLower() != "image/png" && ImageFile.ContentType.ToLower() != "image/jpeg"
+                    && ImageFile.ContentType.ToLower() != "image/gif")
+                    {
+                        return BadRequest("It is not a valid image! Unable to upload!");
                     }
 
-                    model.ImagePath = "/uploads/" + uniqueFileName;
+                    try
+                    {
+                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
+                        string s3Key = "infographics/" + uniqueFileName;
+                        //upload to S3
+                        PutObjectRequest uploadRequest = new PutObjectRequest //generate the request
+                        {
+                            InputStream = ImageFile.OpenReadStream(),
+                            BucketName = "didyoufall4it-bucket",
+                            Key = s3Key,
+                            CannedACL = S3CannedACL.PublicRead,
+                            ContentType = ImageFile.ContentType
+                        };
+                        //send out the request
+                        await awsS3client.PutObjectAsync(uploadRequest);
+                        model.ImagePath = $"https://didyoufall4it-bucket.s3.amazonaws.com/{s3Key}";
+                        model.ImageKey = s3Key;
+                    }
+                    catch (AmazonS3Exception ex)
+                    {
+                        return BadRequest("Unable to upload to S3 due to technical issue. Error message: " + ex.Message);
+                    }
+                    catch (Exception ex)
+                    {
+                        return BadRequest("Unable to upload to S3 due to technical issue. Error message: " + ex.Message);
+                    }
+
                 }
 
                 _context.Infographics.Add(model);

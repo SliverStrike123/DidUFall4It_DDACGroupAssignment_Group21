@@ -17,6 +17,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Models
         public string? Tips { get; set; }
 
         public string? ImagePath { get; set; }
+        public string? ImageKey { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
