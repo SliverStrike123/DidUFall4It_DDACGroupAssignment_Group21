@@ -117,9 +117,6 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             {
                 if (ImageFile != null)
                 {
-                    //1. add credential for action
-                    List<string> values = getValues();
-                    var awsS3client = new AmazonS3Client(values[0], values[1], values[2], RegionEndpoint.USEast1);
                     if (ImageFile.Length <= 0)
                     {
                         return BadRequest("It is an empty file. Unable to upload!");
@@ -132,31 +129,30 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 
                     try
                     {
-                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
-                        string s3Key = "infographics/" + uniqueFileName;
-                        //upload to S3
-                        PutObjectRequest uploadRequest = new PutObjectRequest //generate the request
+                        // Ensure the uploads folder exists inside wwwroot
+                        string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                        if (!Directory.Exists(uploadsFolder))
                         {
-                            InputStream = ImageFile.OpenReadStream(),
-                            BucketName = "didyoufall4it-bucket",
-                            Key = s3Key,
-                            CannedACL = S3CannedACL.PublicRead,
-                            ContentType = ImageFile.ContentType
-                        };
-                        //send out the request
-                        await awsS3client.PutObjectAsync(uploadRequest);
-                        model.ImagePath = $"https://didyoufall4it-bucket.s3.amazonaws.com/{s3Key}";
-                        model.ImageKey = s3Key;
-                    }
-                    catch (AmazonS3Exception ex)
-                    {
-                        return BadRequest("Unable to upload to S3 due to technical issue. Error message: " + ex.Message);
+                            Directory.CreateDirectory(uploadsFolder);
+                        }
+
+                        // Generate unique file name and save it
+                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await ImageFile.CopyToAsync(fileStream);
+                        }
+
+                        // Save relative URL to model
+                        model.ImagePath = "/uploads/" + uniqueFileName;
+                        model.ImageKey = uniqueFileName; // You can use this later if needed
                     }
                     catch (Exception ex)
                     {
-                        return BadRequest("Unable to upload to S3 due to technical issue. Error message: " + ex.Message);
+                        return BadRequest("Unable to upload due to technical issue. Error message: " + ex.Message);
                     }
-
                 }
 
                 _context.Infographics.Add(model);
