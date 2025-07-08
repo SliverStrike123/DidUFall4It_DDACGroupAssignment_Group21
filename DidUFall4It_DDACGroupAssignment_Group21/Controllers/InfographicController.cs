@@ -108,7 +108,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             }
             return View(infographic);
         }
-
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> InfoCreate(InfographicModel model, IFormFile ImageFile)
@@ -120,6 +120,10 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                     if (ImageFile.Length <= 0)
                     {
                         return BadRequest("It is an empty file. Unable to upload!");
+                    }
+                    else if (ImageFile.Length > 1048576) 
+                    {
+                        return BadRequest("The file is too large. Maximum allowed size is 1MB.");
                     }
                     else if (ImageFile.ContentType.ToLower() != "image/png" && ImageFile.ContentType.ToLower() != "image/jpeg"
                     && ImageFile.ContentType.ToLower() != "image/gif")
@@ -185,8 +189,26 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                     existing.Tips = model.Tips;
 
                     // Handle new image upload
-                    if (ImageFile != null && ImageFile.Length > 0)
+                    if (ImageFile != null)
                     {
+                        if (ImageFile.Length <= 0)
+                        {
+                            ModelState.AddModelError("ImageFile", "It is an empty file. Unable to upload!");
+                            return View(model);
+                        }
+                        else if (ImageFile.Length > 1048576) // 1MB
+                        {
+                            ModelState.AddModelError("ImageFile", "The file is too large. Maximum allowed size is 1MB.");
+                            return View(model);
+                        }
+                        else if (ImageFile.ContentType.ToLower() != "image/png"
+                              && ImageFile.ContentType.ToLower() != "image/jpeg"
+                              && ImageFile.ContentType.ToLower() != "image/gif")
+                        {
+                            ModelState.AddModelError("ImageFile", "Invalid image format. Only PNG, JPEG, and GIF are allowed.");
+                            return View(model);
+                        }
+
                         // Delete old image if it exists
                         if (!string.IsNullOrEmpty(existing.ImageKey))
                         {
@@ -202,7 +224,6 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                         string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
                         string savePath = Path.Combine(uploadFolder, uniqueFileName);
 
-                        // Ensure uploads folder exists
                         if (!Directory.Exists(uploadFolder))
                         {
                             Directory.CreateDirectory(uploadFolder);
@@ -213,7 +234,6 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                             await ImageFile.CopyToAsync(stream);
                         }
 
-                        // Update model paths
                         existing.ImagePath = "/uploads/" + uniqueFileName;
                         existing.ImageKey = uniqueFileName;
                     }
