@@ -176,26 +176,46 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             {
                 try
                 {
-                    // Update fields
                     var existing = await _context.Infographics.FindAsync(id);
                     if (existing == null) return NotFound();
 
+                    // Update text fields
                     existing.Title = model.Title;
                     existing.Description = model.Description;
                     existing.Tips = model.Tips;
 
-                    // Optional: handle new image
+                    // Handle new image upload
                     if (ImageFile != null && ImageFile.Length > 0)
                     {
-                        var fileName = Path.GetFileName(ImageFile.FileName);
-                        var savePath = Path.Combine("wwwroot/uploads", fileName);
+                        // Delete old image if it exists
+                        if (!string.IsNullOrEmpty(existing.ImageKey))
+                        {
+                            var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", existing.ImageKey);
+                            if (System.IO.File.Exists(oldPath))
+                            {
+                                System.IO.File.Delete(oldPath);
+                            }
+                        }
+
+                        // Save new image
+                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+                        string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                        string savePath = Path.Combine(uploadFolder, uniqueFileName);
+
+                        // Ensure uploads folder exists
+                        if (!Directory.Exists(uploadFolder))
+                        {
+                            Directory.CreateDirectory(uploadFolder);
+                        }
 
                         using (var stream = new FileStream(savePath, FileMode.Create))
                         {
                             await ImageFile.CopyToAsync(stream);
                         }
 
-                        existing.ImagePath = "/uploads/" + fileName;
+                        // Update model paths
+                        existing.ImagePath = "/uploads/" + uniqueFileName;
+                        existing.ImageKey = uniqueFileName;
                     }
 
                     _context.Update(existing);
@@ -220,9 +240,11 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             {
                 return NotFound();
             }
-            if (!string.IsNullOrEmpty(infographic.ImagePath))
+
+            // Delete the image using ImageKey instead of ImagePath
+            if (!string.IsNullOrEmpty(infographic.ImageKey))
             {
-                var imagePath = Path.Combine("wwwroot", infographic.ImagePath.TrimStart('/'));
+                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", infographic.ImageKey);
                 if (System.IO.File.Exists(imagePath))
                 {
                     System.IO.File.Delete(imagePath);
