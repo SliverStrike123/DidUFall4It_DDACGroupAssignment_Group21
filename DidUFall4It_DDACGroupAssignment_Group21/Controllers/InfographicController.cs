@@ -1,5 +1,6 @@
 ﻿using Amazon;
 using Amazon.S3;
+using Microsoft.AspNetCore.Hosting;
 using Amazon.S3.Model;
 using DidUFall4It_DDACGroupAssignment_Group21.Data;
 using DidUFall4It_DDACGroupAssignment_Group21.Models;

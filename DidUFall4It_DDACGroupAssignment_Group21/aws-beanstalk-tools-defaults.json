@@ -5,7 +5,7 @@
     "framework"     : "net9.0",
     "self-contained" : false,
     "application"    : "didUfall4it-dotnet",
-    "environment"    : "DidUfall4it-dotnet-env-1",
+    "environment"    : "DidUfall4it-dotnet-env-3",
     "enable-xray"    : false,
     "enhanced-health-type" : "basic",
     "additional-options"   : "",
