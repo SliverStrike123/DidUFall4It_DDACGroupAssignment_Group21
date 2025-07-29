@@ -2,6 +2,7 @@
 using Amazon.S3;
 using Microsoft.AspNetCore.Hosting;
 using Amazon.S3.Model;
+using Amazon.S3.Transfer;
 using DidUFall4It_DDACGroupAssignment_Group21.Data;
 using DidUFall4It_DDACGroupAssignment_Group21.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -109,7 +110,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             }
             return View(infographic);
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> InfoCreate(InfographicModel model, IFormFile ImageFile)
@@ -119,44 +120,56 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                 if (ImageFile != null)
                 {
                     if (ImageFile.Length <= 0)
-                    {
                         return BadRequest("It is an empty file. Unable to upload!");
-                    }
-                    else if (ImageFile.Length > 1048576) 
-                    {
+
+                    if (ImageFile.Length > 1048576)
                         return BadRequest("The file is too large. Maximum allowed size is 1MB.");
-                    }
-                    else if (ImageFile.ContentType.ToLower() != "image/png" && ImageFile.ContentType.ToLower() != "image/jpeg"
-                    && ImageFile.ContentType.ToLower() != "image/gif")
+
+                    if (ImageFile.ContentType.ToLower() != "image/png" &&
+                        ImageFile.ContentType.ToLower() != "image/jpeg" &&
+                        ImageFile.ContentType.ToLower() != "image/gif")
                     {
                         return BadRequest("It is not a valid image! Unable to upload!");
                     }
 
                     try
                     {
-                        // Ensure the uploads folder exists inside wwwroot
-                        string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                        if (!Directory.Exists(uploadsFolder))
-                        {
-                            Directory.CreateDirectory(uploadsFolder);
-                        }
+                        // Get AWS credentials and bucket name from appsettings
+                        List<string> values = getValues();
+                        string accessKey = values[0];
+                        string secretKey = values[1];
+                        string bucketName = values[2];
 
-                        // Generate unique file name and save it
+                        var s3Client = new AmazonS3Client(accessKey, secretKey, RegionEndpoint.USEast1); // Use appropriate region
+
+                        // Generate a unique filename for S3
                         string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
-                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        // Upload to S3 using TransferUtility
+                        using (var newMemoryStream = new MemoryStream())
                         {
-                            await ImageFile.CopyToAsync(fileStream);
+                            await ImageFile.CopyToAsync(newMemoryStream);
+
+                            var uploadRequest = new TransferUtilityUploadRequest
+                            {
+                                InputStream = newMemoryStream,
+                                Key = uniqueFileName,
+                                BucketName = bucketName,
+                                ContentType = ImageFile.ContentType,
+                                CannedACL = S3CannedACL.PublicRead // Make it public if needed
+                            };
+
+                            var transferUtility = new TransferUtility(s3Client);
+                            await transferUtility.UploadAsync(uploadRequest);
                         }
 
-                        // Save relative URL to model
-                        model.ImagePath = "/uploads/" + uniqueFileName;
-                        model.ImageKey = uniqueFileName; // You can use this later if needed
+                        // Save S3 URL or key
+                        model.ImagePath = $"https://{bucketName}.s3.amazonaws.com/{uniqueFileName}";
+                        model.ImageKey = uniqueFileName;
                     }
                     catch (Exception ex)
                     {
-                        return BadRequest("Unable to upload due to technical issue. Error message: " + ex.Message);
+                        return BadRequest("Unable to upload to S3. Error: " + ex.Message);
                     }
                 }
 
@@ -189,7 +202,6 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                     existing.Description = model.Description;
                     existing.Tips = model.Tips;
 
-                    // Handle new image upload
                     if (ImageFile != null)
                     {
                         if (ImageFile.Length <= 0)
@@ -210,32 +222,50 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                             return View(model);
                         }
 
-                        // Delete old image if it exists
+                        // Load AWS credentials and bucket
+                        var values = getValues();
+                        var accessKey = values[0];
+                        var secretKey = values[1];
+                        var bucketName = values[2];
+
+                        var s3Client = new AmazonS3Client(accessKey, secretKey, RegionEndpoint.APSoutheast1);
+
+                        // Delete existing image from S3 if exists
                         if (!string.IsNullOrEmpty(existing.ImageKey))
                         {
-                            var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", existing.ImageKey);
-                            if (System.IO.File.Exists(oldPath))
+                            try
                             {
-                                System.IO.File.Delete(oldPath);
+                                await s3Client.DeleteObjectAsync(bucketName, existing.ImageKey);
+                            }
+                            catch (Exception ex)
+                            {
+                                // Optional: log this error if deletion fails
                             }
                         }
 
-                        // Save new image
+                        // Generate new unique filename
                         string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
-                        string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                        string savePath = Path.Combine(uploadFolder, uniqueFileName);
 
-                        if (!Directory.Exists(uploadFolder))
+                        // Upload new image to S3
+                        using (var newMemoryStream = new MemoryStream())
                         {
-                            Directory.CreateDirectory(uploadFolder);
+                            await ImageFile.CopyToAsync(newMemoryStream);
+
+                            var uploadRequest = new TransferUtilityUploadRequest
+                            {
+                                InputStream = newMemoryStream,
+                                Key = uniqueFileName,
+                                BucketName = bucketName,
+                                ContentType = ImageFile.ContentType,
+                                CannedACL = S3CannedACL.PublicRead
+                            };
+
+                            var fileTransferUtility = new TransferUtility(s3Client);
+                            await fileTransferUtility.UploadAsync(uploadRequest);
                         }
 
-                        using (var stream = new FileStream(savePath, FileMode.Create))
-                        {
-                            await ImageFile.CopyToAsync(stream);
-                        }
-
-                        existing.ImagePath = "/uploads/" + uniqueFileName;
+                        // Update model with new image info
+                        existing.ImagePath = $"https://{bucketName}.s3.amazonaws.com/{uniqueFileName}";
                         existing.ImageKey = uniqueFileName;
                     }
 
