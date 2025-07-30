@@ -14,7 +14,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
     {
         private readonly DidUFall4It_DDACGroupAssignment_Group21Context _context;
         private readonly IWebHostEnvironment _environment;
-
+        private string bucketNameS3 = "didyoufall4it-bucket";
         public InfographicController(IWebHostEnvironment environment, DidUFall4It_DDACGroupAssignment_Group21Context context)
         {
             _context = context;
@@ -119,62 +119,42 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
             {
                 if (ImageFile != null)
                 {
-                    if (ImageFile.Length <= 0)
-                        return BadRequest("It is an empty file. Unable to upload!");
-
-                    if (ImageFile.Length > 1048576)
-                        return BadRequest("The file is too large. Maximum allowed size is 1MB.");
-
-                    if (ImageFile.ContentType.ToLower() != "image/png" &&
-                        ImageFile.ContentType.ToLower() != "image/jpeg" &&
-                        ImageFile.ContentType.ToLower() != "image/gif")
-                    {
-                        return BadRequest("It is not a valid image! Unable to upload!");
-                    }
-
                     try
                     {
-                        // Get AWS credentials and bucket name from appsettings
+                        
                         List<string> values = getValues();
-                        string accessKey = values[0];
-                        string secretKey = values[1];
-                        string bucketName = values[2];
 
-                        var s3Client = new AmazonS3Client(accessKey, secretKey, RegionEndpoint.USEast1); // Use appropriate region
+                        var s3Client = new AmazonS3Client(values[0], values[1], values[2], RegionEndpoint.USEast1);
 
-                        // Generate a unique filename for S3
-                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+                        string uniqueFileName = "infographics/" + Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
 
-                        // Upload to S3 using TransferUtility
                         using (var newMemoryStream = new MemoryStream())
                         {
                             await ImageFile.CopyToAsync(newMemoryStream);
 
-                            var uploadRequest = new TransferUtilityUploadRequest
+                            PutObjectRequest uploadRequest = new PutObjectRequest
                             {
                                 InputStream = newMemoryStream,
                                 Key = uniqueFileName,
-                                BucketName = bucketName,
+                                BucketName = bucketNameS3,
                                 ContentType = ImageFile.ContentType,
-                                CannedACL = S3CannedACL.PublicRead // Make it public if needed
+                                CannedACL = S3CannedACL.PublicRead 
                             };
 
-                            var transferUtility = new TransferUtility(s3Client);
-                            await transferUtility.UploadAsync(uploadRequest);
+                            await s3Client.PutObjectAsync(uploadRequest);
                         }
-
-                        // Save S3 URL or key
-                        model.ImagePath = $"https://{bucketName}.s3.amazonaws.com/{uniqueFileName}";
                         model.ImageKey = uniqueFileName;
+                        model.ImagePath = $"https://{bucketNameS3}.s3.amazonaws.com/{uniqueFileName}";
                     }
                     catch (Exception ex)
                     {
-                        return BadRequest("Unable to upload to S3. Error: " + ex.Message);
+                        return BadRequest("Error uploading to S3: " + ex.Message);
                     }
                 }
 
                 _context.Infographics.Add(model);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction("InfoList", "Infographic");
             }
 
