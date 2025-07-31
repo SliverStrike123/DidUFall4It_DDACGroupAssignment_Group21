@@ -186,67 +186,45 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                     {
                         if (ImageFile.Length <= 0)
                         {
-                            ModelState.AddModelError("ImageFile", "It is an empty file. Unable to upload!");
-                            return View(model);
-                        }
-                        else if (ImageFile.Length > 1048576) // 1MB
-                        {
-                            ModelState.AddModelError("ImageFile", "The file is too large. Maximum allowed size is 1MB.");
-                            return View(model);
-                        }
-                        else if (ImageFile.ContentType.ToLower() != "image/png"
-                              && ImageFile.ContentType.ToLower() != "image/jpeg"
-                              && ImageFile.ContentType.ToLower() != "image/gif")
-                        {
-                            ModelState.AddModelError("ImageFile", "Invalid image format. Only PNG, JPEG, and GIF are allowed.");
+                            ModelState.AddModelError("ImageFile", "Empty file. Unable to upload!");
                             return View(model);
                         }
 
-                        // Load AWS credentials and bucket
-                        var values = getValues();
-                        var accessKey = values[0];
-                        var secretKey = values[1];
-                        var bucketName = values[2];
+                        List<string> values = getValues();
 
-                        var s3Client = new AmazonS3Client(accessKey, secretKey, RegionEndpoint.APSoutheast1);
+                        var s3Client = new AmazonS3Client(values[0], values[1], values[2], RegionEndpoint.USEast1);
 
-                        // Delete existing image from S3 if exists
+                        // Delete previous image if exists
                         if (!string.IsNullOrEmpty(existing.ImageKey))
                         {
                             try
                             {
-                                await s3Client.DeleteObjectAsync(bucketName, existing.ImageKey);
+                                await s3Client.DeleteObjectAsync(bucketNameS3, existing.ImageKey);
                             }
-                            catch (Exception ex)
-                            {
-                                // Optional: log this error if deletion fails
-                            }
+                            catch { /* optional logging */ }
                         }
 
-                        // Generate new unique filename
-                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+                        string uniqueFileName = "infographics/" + Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
 
-                        // Upload new image to S3
                         using (var newMemoryStream = new MemoryStream())
                         {
                             await ImageFile.CopyToAsync(newMemoryStream);
 
-                            var uploadRequest = new TransferUtilityUploadRequest
+                            PutObjectRequest uploadRequest = new PutObjectRequest
                             {
                                 InputStream = newMemoryStream,
                                 Key = uniqueFileName,
-                                BucketName = bucketName,
+                                BucketName = bucketNameS3,
                                 ContentType = ImageFile.ContentType,
                                 CannedACL = S3CannedACL.PublicRead
                             };
 
-                            var fileTransferUtility = new TransferUtility(s3Client);
-                            await fileTransferUtility.UploadAsync(uploadRequest);
+                            await s3Client.PutObjectAsync(uploadRequest);
                         }
 
-                        // Update model with new image info
-                        existing.ImagePath = $"https://{bucketName}.s3.amazonaws.com/{uniqueFileName}";
+                        // Update DB with new S3 image key + path
                         existing.ImageKey = uniqueFileName;
+                        existing.ImagePath = $"https://{bucketNameS3}.s3.amazonaws.com/{uniqueFileName}";
                     }
 
                     _context.Update(existing);
