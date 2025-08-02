@@ -2,6 +2,8 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
 using DidUFall4It_DDACGroupAssignment_Group21.Data;
 using DidUFall4It_DDACGroupAssignment_Group21.Models;
 using Microsoft.AspNetCore.Http;
@@ -377,11 +379,11 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> InsightCreate(
-    int QuizId,
-    string Tag,
-    double? AverageScore,
-    int? HighestScore,
-    int? LowestScore)
+            int QuizId,
+            string Tag,
+            double? AverageScore,
+            int? HighestScore,
+            int? LowestScore)
         {
             // Extract attempts for the quiz
             var attempts = _context.QuizAttempts
@@ -438,24 +440,55 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                     sessionToken,
                     Amazon.RegionEndpoint.USEast1);
 
+                var uploadKey = $"insights/quiz_{QuizId}_{DateTime.UtcNow:yyyyMMddHHmmss}.json";
+
                 var uploadRequest = new TransferUtilityUploadRequest
                 {
                     InputStream = stream,
-                    Key = $"insights/quiz_{QuizId}_{DateTime.UtcNow:yyyyMMddHHmmss}.json",
+                    Key = uploadKey,
                     BucketName = BucketName,
                     ContentType = "application/json",
-                    CannedACL = S3CannedACL.PublicRead // Make file publicly readable
+                    CannedACL = S3CannedACL.PublicRead
                 };
 
                 var fileTransferUtility = new TransferUtility(s3Client);
                 await fileTransferUtility.UploadAsync(uploadRequest);
 
                 Console.WriteLine("Insight uploaded to S3 successfully.");
+
+                // ---- Publish notification to AWS SNS ----
+                using var snsClient = new AmazonSimpleNotificationServiceClient(
+                    accessKey,
+                    secretKey,
+                    sessionToken,
+                    Amazon.RegionEndpoint.USEast1);
+
+                var publishRequest = new PublishRequest
+                {
+                    TopicArn = "arn:aws:sns:us-east-1:067385453713:NewInsightTopic", // 🔁 REPLACE with actual ARN
+                    Subject = "New Insight Created",
+                    Message = JsonSerializer.Serialize(new
+                    {
+                        QuizId = insight.QuizId,
+                        Tag = insight.Tag,
+                        S3Key = uploadKey,
+                        Timestamp = DateTime.UtcNow
+                    })
+                };
+
+                var snsResponse = await snsClient.PublishAsync(publishRequest);
+                Console.WriteLine("SNS notification published: " + snsResponse.MessageId);
             }
             catch (AmazonS3Exception ex)
             {
                 Console.WriteLine($"AWS S3 Upload Error: {ex.Message}");
                 TempData["Error"] = "Insight creation failed during S3 upload.";
+                return RedirectToAction("InsightList");
+            }
+            catch (AmazonSimpleNotificationServiceException ex)
+            {
+                Console.WriteLine($"AWS SNS Error: {ex.Message}");
+                TempData["Error"] = "Insight created, but SNS notification failed.";
                 return RedirectToAction("InsightList");
             }
             catch (Exception ex)
@@ -465,11 +498,10 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                 return RedirectToAction("InsightList");
             }
 
-            // ------------------------------------------
-
-            TempData["Message"] = "Insight created and uploaded to S3!";
+            TempData["Message"] = "Insight created, uploaded to S3, and SNS notified!";
             return RedirectToAction("InsightList");
         }
+
 
 
 
