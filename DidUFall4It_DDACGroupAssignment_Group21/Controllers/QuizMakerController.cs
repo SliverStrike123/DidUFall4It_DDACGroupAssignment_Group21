@@ -1,7 +1,16 @@
-﻿using DidUFall4It_DDACGroupAssignment_Group21.Data;
+﻿using Amazon; //for linking your AWS account
+using Amazon.S3;
+using Amazon.S3.Model;
+using Amazon.S3.Transfer;
+using DidUFall4It_DDACGroupAssignment_Group21.Data;
 using DidUFall4It_DDACGroupAssignment_Group21.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration; //appsettings.json section
+using System.IO; // input output
+using System.Text;
+using System.Text.Json;
 
 namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 {
@@ -9,6 +18,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
     {
         private readonly DidUFall4It_DDACGroupAssignment_Group21Context _context;
         private readonly IWebHostEnvironment _environment;
+        private const string BucketName = "didyoufall4it-infographic-bucket"; 
 
         public QuizMakerController(IWebHostEnvironment environment, DidUFall4It_DDACGroupAssignment_Group21Context context)
         {
@@ -189,6 +199,21 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         //    }
         //    return Content("Dummy QuizReview seeded.");
         //}
+        //function 1: connection string to the AWS Account
+        private List<string> getValues()
+        {
+            List<string> values = new List<string>();
+            //1. link to appsettings.json and get back the values
+            var builder = new ConfigurationBuilder()
+                            .SetBasePath(Directory.GetCurrentDirectory())
+                            .AddJsonFile("appsettings.json");
+            IConfigurationRoot configure = builder.Build(); //build the json file
+            //2. read the info from json using configure instance
+            values.Add(configure["Values:Key1"]);
+            values.Add(configure["Values:Key2"]);
+            values.Add(configure["Values:Key3"]);
+            return values;
+        }
 
 
         [HttpPost]
@@ -351,14 +376,14 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult InsightCreate(
-            int QuizId,
-            string Tag,
-            double? AverageScore,
-            int? HighestScore,
-            int? LowestScore)
+        public async Task<IActionResult> InsightCreate(
+    int QuizId,
+    string Tag,
+    double? AverageScore,
+    int? HighestScore,
+    int? LowestScore)
         {
-            // Always extract ratings/comments from QuizAttempts for this quiz
+            // Extract attempts for the quiz
             var attempts = _context.QuizAttempts
                 .Where(a => a.QuizID == QuizId)
                 .ToList();
@@ -390,11 +415,62 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                 Comments = notes
             };
 
+            // Save to database
             _context.QuizReviews.Add(insight);
             _context.SaveChanges();
 
+            // ---- Upload insight as JSON to AWS S3 ----
+            try
+            {
+                string json = JsonSerializer.Serialize(insight);
+                using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+
+                var values = getValues(); // Reads from appsettings.json
+                string accessKey = values[0];
+                string secretKey = values[1];
+                string sessionToken = values[2];
+
+                const string BucketName = "didyoufall4it-infographic-bucket";
+
+                using var s3Client = new AmazonS3Client(
+                    accessKey,
+                    secretKey,
+                    sessionToken,
+                    Amazon.RegionEndpoint.USEast1);
+
+                var uploadRequest = new TransferUtilityUploadRequest
+                {
+                    InputStream = stream,
+                    Key = $"insights/quiz_{QuizId}_{DateTime.UtcNow:yyyyMMddHHmmss}.json",
+                    BucketName = BucketName,
+                    ContentType = "application/json",
+                    CannedACL = S3CannedACL.PublicRead // Make file publicly readable
+                };
+
+                var fileTransferUtility = new TransferUtility(s3Client);
+                await fileTransferUtility.UploadAsync(uploadRequest);
+
+                Console.WriteLine("Insight uploaded to S3 successfully.");
+            }
+            catch (AmazonS3Exception ex)
+            {
+                Console.WriteLine($"AWS S3 Upload Error: {ex.Message}");
+                TempData["Error"] = "Insight creation failed during S3 upload.";
+                return RedirectToAction("InsightList");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"General Error: {ex.Message}");
+                TempData["Error"] = "Unexpected error occurred during upload.";
+                return RedirectToAction("InsightList");
+            }
+
+            // ------------------------------------------
+
+            TempData["Message"] = "Insight created and uploaded to S3!";
             return RedirectToAction("InsightList");
         }
+
 
 
         // POST: Update the insight
