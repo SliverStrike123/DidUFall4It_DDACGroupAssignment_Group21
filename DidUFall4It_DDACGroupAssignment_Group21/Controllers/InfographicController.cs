@@ -14,7 +14,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
     {
         private readonly DidUFall4It_DDACGroupAssignment_Group21Context _context;
         private readonly IWebHostEnvironment _environment;
-        private string bucketNameS3 = "didyoufall4it-bucket";
+        private string bucketNameS3 = "didyoufall4it-bucket-1";
         public InfographicController(IWebHostEnvironment environment, DidUFall4It_DDACGroupAssignment_Group21Context context)
         {
             _context = context;
