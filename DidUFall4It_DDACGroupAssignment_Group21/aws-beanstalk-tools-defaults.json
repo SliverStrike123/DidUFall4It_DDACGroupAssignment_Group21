@@ -4,9 +4,9 @@
     "configuration" : "Debug",
     "framework"     : "net9.0",
     "self-contained" : false,
-    "application"    : "didUfall4it-dotnet",
-    "environment"    : "DidUfall4it-dotnet-env-3",
-    "enable-xray"    : false,
+    "application"    : "didyoufall4it_application",
+    "environment"    : "Didyoufall4itapplication-env",
+    "enable-xray"    : true,
     "enhanced-health-type" : "basic",
     "additional-options"   : "",
     "proxy-server"         : "nginx"
