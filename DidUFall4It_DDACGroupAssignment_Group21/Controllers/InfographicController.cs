@@ -16,8 +16,8 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
     {
         private readonly DidUFall4It_DDACGroupAssignment_Group21Context _context;
         private readonly IWebHostEnvironment _environment;
-        private string bucketNameS3 = "didyoufall4it-bucket-1";
-        private string snsTopicArn = "arn:aws:sns:us-east-1:566588798505:success-image-upload"; // Replace with your actual SNS topic ARN
+        private string bucketNameS3 = "didyoufall4it-bucket";
+        private string snsTopicArn = "arn:aws:sns:us-east-1:859425880780:success-image-upload"; // Replace with your actual SNS topic ARN
         public InfographicController(IWebHostEnvironment environment, DidUFall4It_DDACGroupAssignment_Group21Context context)
         {
             _context = context;
