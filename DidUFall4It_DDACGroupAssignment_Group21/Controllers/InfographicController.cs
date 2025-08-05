@@ -176,7 +176,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 
                         content.Add(new StreamContent(stream), "file", ImageFile.FileName);
 
-                        var response = await client.PostAsync("https://your-api-gateway-url.com/upload", content);
+                        var response = await client.PostAsync("https://fnabbusm0h.execute-api.us-east-1.amazonaws.com/INFOGRAPHICAPI/INFOGRAPHIC", content);
                         if (!response.IsSuccessStatusCode)
                             return BadRequest("Upload failed: " + await response.Content.ReadAsStringAsync());
 
