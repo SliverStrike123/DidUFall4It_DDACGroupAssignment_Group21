@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DidUFall4It_DDACGroupAssignment_Group21.Data;
 using DidUFall4It_DDACGroupAssignment_Group21.Areas.Identity.Data;
+using Amazon.XRay.Recorder.Handlers.AwsSdk;
+
+AWSSDKHandler.RegisterXRayForAllServices();
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DidUFall4It_DDACGroupAssignment_Group21ContextConnection") ?? throw new InvalidOperationException("Connection string 'DidUFall4It_DDACGroupAssignment_Group21ContextConnection' not found.");;
 
@@ -19,7 +22,8 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-
+builder.WebHost.CaptureStartupErrors(true);
+builder.Logging.AddConsole();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -31,18 +35,17 @@ if (!app.Environment.IsDevelopment())
 }
 
 
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseStaticFiles();
 app.MapStaticAssets();
-
+app.UseXRay("didyoufall4it_application");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 app.MapRazorPages();
 app.Run();
