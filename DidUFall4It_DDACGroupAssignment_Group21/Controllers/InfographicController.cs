@@ -121,49 +121,6 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         {
             if (ModelState.IsValid)
             {
-                //if (ImageFile != null)
-                //{
-                //    try
-                //    {
-
-                //        List<string> values = getValues();
-
-                //        var s3Client = new AmazonS3Client(values[0], values[1], values[2], RegionEndpoint.USEast1);
-                //        var snsClient = new AmazonSimpleNotificationServiceClient(values[0], values[1], values[2], RegionEndpoint.USEast1);
-
-
-                //        string uniqueFileName = "infographics/" + Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
-
-                //        using (var newMemoryStream = new MemoryStream())
-                //        {
-                //            await ImageFile.CopyToAsync(newMemoryStream);
-
-                //            PutObjectRequest uploadRequest = new PutObjectRequest
-                //            {
-                //                InputStream = newMemoryStream,
-                //                Key = uniqueFileName,
-                //                BucketName = bucketNameS3,
-                //                ContentType = ImageFile.ContentType,
-                //                CannedACL = S3CannedACL.PublicRead 
-                //            };
-
-                //            await s3Client.PutObjectAsync(uploadRequest);
-                //        }
-                //        model.ImageKey = uniqueFileName;
-                //        model.ImagePath = $"https://{bucketNameS3}.s3.amazonaws.com/{uniqueFileName}";
-                //        var snsRequest = new PublishRequest
-                //        {
-                //            TopicArn = snsTopicArn, // ← you need to set this variable
-                //            Subject = "Infographic Uploaded",
-                //            Message = $"An infographic has been uploaded: {model.ImagePath}"
-                //        };
-                //        await snsClient.PublishAsync(snsRequest);
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        return BadRequest("Error uploading to S3: " + ex.Message);
-                //    }
-                //}
 
                 if (ImageFile != null)
                 {
@@ -220,55 +177,25 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 
                     if (ImageFile != null)
                     {
-                        if (ImageFile.Length <= 0)
+                        using (var client = new HttpClient())
+                        using (var content = new MultipartFormDataContent())
+                        using (var stream = new MemoryStream())
                         {
-                            ModelState.AddModelError("ImageFile", "Empty file. Unable to upload!");
-                            return View(model);
+                            await ImageFile.CopyToAsync(stream);
+                            stream.Position = 0;
+
+                            content.Add(new StreamContent(stream), "file", ImageFile.FileName);
+
+                            var response = await client.PostAsync("https://fnabbusm0h.execute-api.us-east-1.amazonaws.com/INFOGRAPHICAPI/INFOGRAPHIC", content);
+                            if (!response.IsSuccessStatusCode)
+                                return BadRequest("Upload failed: " + await response.Content.ReadAsStringAsync());
+
+                            var responseContent = await response.Content.ReadAsStringAsync();
+                            dynamic data = JsonConvert.DeserializeObject(responseContent);
+
+                            existing.ImageKey = data.imageKey;
+                            existing.ImagePath = data.imageUrl;
                         }
-
-                        List<string> values = getValues();
-
-                        var s3Client = new AmazonS3Client(values[0], values[1], values[2], RegionEndpoint.USEast1);
-                        var snsClient = new AmazonSimpleNotificationServiceClient(values[0], values[1], values[2], RegionEndpoint.USEast1);
-
-                        // Delete previous image if exists
-                        if (!string.IsNullOrEmpty(existing.ImageKey))
-                        {
-                            try
-                            {
-                                await s3Client.DeleteObjectAsync(bucketNameS3, existing.ImageKey);
-                            }
-                            catch { /* optional logging */ }
-                        }
-
-                        string uniqueFileName = "infographics/" + Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
-
-                        using (var newMemoryStream = new MemoryStream())
-                        {
-                            await ImageFile.CopyToAsync(newMemoryStream);
-
-                            PutObjectRequest uploadRequest = new PutObjectRequest
-                            {
-                                InputStream = newMemoryStream,
-                                Key = uniqueFileName,
-                                BucketName = bucketNameS3,
-                                ContentType = ImageFile.ContentType,
-                                CannedACL = S3CannedACL.PublicRead
-                            };
-
-                            await s3Client.PutObjectAsync(uploadRequest);
-                        }
-                        var snsRequest = new PublishRequest
-                        {
-                            TopicArn = snsTopicArn, 
-                            Subject = "Infographic Uploaded",
-                            Message = $"An infographic has been uploaded: {model.ImagePath}"
-                        };
-                        await snsClient.PublishAsync(snsRequest);
-
-                        // Update DB with new S3 image key + path
-                        existing.ImageKey = uniqueFileName;
-                        existing.ImagePath = $"https://{bucketNameS3}.s3.amazonaws.com/{uniqueFileName}";
                     }
 
                     _context.Update(existing);

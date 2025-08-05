@@ -42,7 +42,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapStaticAssets();
-app.UseXRay("didyoufall4it_application");
+//app.UseXRay("didyoufall4it_application");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
