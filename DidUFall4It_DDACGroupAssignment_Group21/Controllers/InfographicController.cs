@@ -1,12 +1,15 @@
 ﻿using Amazon;
 using Amazon.S3;
-using Microsoft.AspNetCore.Hosting;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
 using DidUFall4It_DDACGroupAssignment_Group21.Data;
 using DidUFall4It_DDACGroupAssignment_Group21.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using static System.Net.Mime.MediaTypeNames;
 namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 {
@@ -15,6 +18,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         private readonly DidUFall4It_DDACGroupAssignment_Group21Context _context;
         private readonly IWebHostEnvironment _environment;
         private string bucketNameS3 = "didyoufall4it-bucket";
+        private string snsTopicArn = "arn:aws:sns:us-east-1:859425880780:success-image-upload";
         public InfographicController(IWebHostEnvironment environment, DidUFall4It_DDACGroupAssignment_Group21Context context)
         {
             _context = context;
@@ -117,38 +121,70 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
         {
             if (ModelState.IsValid)
             {
+                //if (ImageFile != null)
+                //{
+                //    try
+                //    {
+
+                //        List<string> values = getValues();
+
+                //        var s3Client = new AmazonS3Client(values[0], values[1], values[2], RegionEndpoint.USEast1);
+                //        var snsClient = new AmazonSimpleNotificationServiceClient(values[0], values[1], values[2], RegionEndpoint.USEast1);
+
+
+                //        string uniqueFileName = "infographics/" + Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+
+                //        using (var newMemoryStream = new MemoryStream())
+                //        {
+                //            await ImageFile.CopyToAsync(newMemoryStream);
+
+                //            PutObjectRequest uploadRequest = new PutObjectRequest
+                //            {
+                //                InputStream = newMemoryStream,
+                //                Key = uniqueFileName,
+                //                BucketName = bucketNameS3,
+                //                ContentType = ImageFile.ContentType,
+                //                CannedACL = S3CannedACL.PublicRead 
+                //            };
+
+                //            await s3Client.PutObjectAsync(uploadRequest);
+                //        }
+                //        model.ImageKey = uniqueFileName;
+                //        model.ImagePath = $"https://{bucketNameS3}.s3.amazonaws.com/{uniqueFileName}";
+                //        var snsRequest = new PublishRequest
+                //        {
+                //            TopicArn = snsTopicArn, // ← you need to set this variable
+                //            Subject = "Infographic Uploaded",
+                //            Message = $"An infographic has been uploaded: {model.ImagePath}"
+                //        };
+                //        await snsClient.PublishAsync(snsRequest);
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        return BadRequest("Error uploading to S3: " + ex.Message);
+                //    }
+                //}
+
                 if (ImageFile != null)
                 {
-                    try
+                    using (var client = new HttpClient())
+                    using (var content = new MultipartFormDataContent())
+                    using (var stream = new MemoryStream())
                     {
-                        
-                        List<string> values = getValues();
+                        await ImageFile.CopyToAsync(stream);
+                        stream.Position = 0;
 
-                        var s3Client = new AmazonS3Client(values[0], values[1], values[2], RegionEndpoint.USEast1);
+                        content.Add(new StreamContent(stream), "file", ImageFile.FileName);
 
-                        string uniqueFileName = "infographics/" + Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+                        var response = await client.PostAsync("https://your-api-gateway-url.com/upload", content);
+                        if (!response.IsSuccessStatusCode)
+                            return BadRequest("Upload failed: " + await response.Content.ReadAsStringAsync());
 
-                        using (var newMemoryStream = new MemoryStream())
-                        {
-                            await ImageFile.CopyToAsync(newMemoryStream);
+                        var responseContent = await response.Content.ReadAsStringAsync();
+                        dynamic data = JsonConvert.DeserializeObject(responseContent);
 
-                            PutObjectRequest uploadRequest = new PutObjectRequest
-                            {
-                                InputStream = newMemoryStream,
-                                Key = uniqueFileName,
-                                BucketName = bucketNameS3,
-                                ContentType = ImageFile.ContentType,
-                                CannedACL = S3CannedACL.PublicRead 
-                            };
-
-                            await s3Client.PutObjectAsync(uploadRequest);
-                        }
-                        model.ImageKey = uniqueFileName;
-                        model.ImagePath = $"https://{bucketNameS3}.s3.amazonaws.com/{uniqueFileName}";
-                    }
-                    catch (Exception ex)
-                    {
-                        return BadRequest("Error uploading to S3: " + ex.Message);
+                        model.ImageKey = data.imageKey;
+                        model.ImagePath = data.imageUrl;
                     }
                 }
 
@@ -193,6 +229,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
                         List<string> values = getValues();
 
                         var s3Client = new AmazonS3Client(values[0], values[1], values[2], RegionEndpoint.USEast1);
+                        var snsClient = new AmazonSimpleNotificationServiceClient(values[0], values[1], values[2], RegionEndpoint.USEast1);
 
                         // Delete previous image if exists
                         if (!string.IsNullOrEmpty(existing.ImageKey))
@@ -221,6 +258,13 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 
                             await s3Client.PutObjectAsync(uploadRequest);
                         }
+                        var snsRequest = new PublishRequest
+                        {
+                            TopicArn = snsTopicArn, 
+                            Subject = "Infographic Uploaded",
+                            Message = $"An infographic has been uploaded: {model.ImagePath}"
+                        };
+                        await snsClient.PublishAsync(snsRequest);
 
                         // Update DB with new S3 image key + path
                         existing.ImageKey = uniqueFileName;
