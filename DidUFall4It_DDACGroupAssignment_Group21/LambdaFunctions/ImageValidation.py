@@ -16,7 +16,7 @@ sns = boto3.client('sns')
 bucket_name = 'didyoufall4it-bucket'
 success_topic_arn = 'arn:aws:sns:us-east-1:859425880780:success-image-upload'
 invalid_topic_arn = 'arn:aws:sns:us-east-1:859425880780:invalid-image-uploads'
-max_size = 5 * 1024 * 1024  # 5 MB
+max_size = 2 * 1024 * 1024  # 2 MB
 allowed_extensions = ['.png', '.jpg', '.jpeg', '.gif']
 
 def lambda_handler(event, context):
@@ -65,7 +65,7 @@ def lambda_handler(event, context):
             logger.info("Unsuccessful Upload, image size too big")
             return {
                 "statusCode": 400,
-                "body": json.dumps({"error": "File too large. Max 5MB allowed."})
+                "body": json.dumps({"error": "File too large. Max 2MB allowed."})
             }
 
         filename = locals().get("filename") or event.get("queryStringParameters", {}).get("filename", "image.jpg")
