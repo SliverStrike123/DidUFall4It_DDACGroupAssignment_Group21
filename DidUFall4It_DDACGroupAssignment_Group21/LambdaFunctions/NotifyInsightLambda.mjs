@@ -4,7 +4,10 @@ const snsClient = new SNSClient({});
 
 export const handler = async (event) => {
     try {
-        const snsMessage = event.Records?.[0]?.Sns?.Message;
+        console.log("Received event:", JSON.stringify(event, null, 2));
+
+        const sqsBody = JSON.parse(event.Records[0].body);
+        const snsMessage = sqsBody.Message;
         const messageData = JSON.parse(snsMessage);
 
         const newMessage = {
@@ -15,7 +18,7 @@ export const handler = async (event) => {
         };
 
         const command = new PublishCommand({
-            TopicArn: 'arn:aws:sns:us-east-1:067385453713:NewInsightTopic', // Replace with your actual topic ARN
+            TopicArn: 'arn:aws:sns:us-east-1:067385453713:NewInsightTopic',
             Message: JSON.stringify(newMessage),
         });
 

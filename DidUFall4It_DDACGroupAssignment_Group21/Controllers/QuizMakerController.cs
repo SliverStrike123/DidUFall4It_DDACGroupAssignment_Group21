@@ -465,7 +465,7 @@ namespace DidUFall4It_DDACGroupAssignment_Group21.Controllers
 
                 var publishRequest = new PublishRequest
                 {
-                    TopicArn = "arn:aws:sns:us-east-1:067385453713:NewInsightTopic", // 🔁 REPLACE with actual ARN
+                    TopicArn = "arn:aws:sns:us-east-1:067385453713:NewInsightTopic", 
                     Subject = "New Insight Created",
                     Message = JsonSerializer.Serialize(new
                     {
