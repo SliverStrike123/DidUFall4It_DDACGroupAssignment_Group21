@@ -31,13 +31,11 @@ def lambda_handler(event, context):
         else:
             decoded = body.encode('utf-8')
 
-        # Extract content-type and boundary
         content_type = event["headers"].get("content-type") or event["headers"].get("Content-Type")
         if not content_type:
             raise ValueError("Missing content type header")
 
         if content_type.startswith("multipart/form-data"):
-            # Extract boundary
             match = re.search(r'boundary="?([^";]+)"?', content_type)
             if not match:
                 raise ValueError("Boundary not found in content-type header")
@@ -57,7 +55,6 @@ def lambda_handler(event, context):
             else:
                 raise ValueError("No file part found in multipart data")
 
-        # File size check
         file_size = len(decoded)
         if file_size > max_size:
             sns.publish(
@@ -71,7 +68,6 @@ def lambda_handler(event, context):
                 "body": json.dumps({"error": "File too large. Max 5MB allowed."})
             }
 
-        # Filename and extension check (default fallback if not multipart)
         filename = locals().get("filename") or event.get("queryStringParameters", {}).get("filename", "image.jpg")
         ext = os.path.splitext(filename.lower())[1]
         if ext not in allowed_extensions:
@@ -86,7 +82,6 @@ def lambda_handler(event, context):
                 "body": json.dumps({"error": f"Unsupported file extension: {ext}"})
             }
 
-        # Upload to S3
         key = f"infographics/{filename}"
         s3.put_object(
             Bucket=bucket_name,
